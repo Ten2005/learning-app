@@ -1,12 +1,4 @@
-import {
-  Calendar,
-  Folder,
-  Home,
-  Inbox,
-  Plus,
-  Search,
-  Settings,
-} from "lucide-react";
+import { Folder, Plus } from "lucide-react";
 
 import {
   Sidebar,

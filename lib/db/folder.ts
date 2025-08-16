@@ -6,9 +6,10 @@ export async function getFolders() {
   const user = await getUser();
   const { data, error } = await supabase
     .from("folder")
-    .select("*")
+    .select("id, name")
     .eq("user_id", user.id)
-    .eq("deleted_at", null);
+    .eq("is_deleted", false);
+  console.log(data);
   if (error) {
     console.error(error);
     throw new Error("Failed to get folders");

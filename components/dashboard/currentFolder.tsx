@@ -17,6 +17,7 @@ import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
 import {
   deleteFolderAction,
+  deleteFileAction,
   updateFolderAction,
 } from "@/app/(main)/dashboard/actions";
 import { Input } from "../ui/input";
@@ -52,17 +53,32 @@ export default function CurrentFolder() {
             </AccordionTrigger>
             <AccordionContent>
               {currentFiles.map((file) => (
-                <Button
+                <div
+                  className="flex items-center justify-between w-full"
                   key={file.id}
-                  variant="ghost"
-                  size="sm"
-                  className="p-0 justify-start w-full text-muted-foreground"
-                  onClick={() => {
-                    setCurrentFile(file);
-                  }}
                 >
-                  {file.page} : {file.title || "None"}
-                </Button>
+                  <Button
+                    key={file.id}
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground"
+                    onClick={() => {
+                      setCurrentFile(file);
+                    }}
+                  >
+                    {file.page} : {file.title || "None"}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="text-destructive"
+                    onClick={() => {
+                      deleteFileAction(file.id);
+                    }}
+                  >
+                    <Trash2Icon className="w-4 h-4" />
+                  </Button>
+                </div>
               ))}
             </AccordionContent>
           </AccordionItem>

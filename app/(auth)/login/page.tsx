@@ -11,20 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
-import { useRouter } from "next/navigation";
 import { PRODUCT_NAME } from "@/constants";
+import { login } from "./actions";
 
 export default function Login() {
-  const router = useRouter();
   const { email, password, setEmail, setPassword } = useAuthStore();
-
-  const handleLogin = () => {
-    console.log(email, password);
-    router.push("/dashboard");
-  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen p-2">
@@ -34,15 +28,9 @@ export default function Login() {
           <CardDescription>
             Enter your email and password below to login to your account
           </CardDescription>
-          <CardAction>
-            <Button variant="link" type="submit" onClick={handleLogin}>
-              Login
-              <ArrowRightIcon className="w-4 h-4" />
-            </Button>
-          </CardAction>
         </CardHeader>
         <CardContent>
-          <form className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -64,12 +52,24 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-          </form>
+          </div>
+          <CardAction className="mt-4">
+            <Button
+              size={"sm"}
+              type="submit"
+              onClick={() => login(email, password)}
+            >
+              Login
+            </Button>
+          </CardAction>
         </CardContent>
       </Card>
       <div className="flex justify-start w-full max-w-md">
         <Button variant={"link"} asChild>
-          <Link href="/signup">Signup</Link>
+          <Link href="/signup">
+            <ArrowLeftIcon className="w-4 h-4" />
+            Signup
+          </Link>
         </Button>
       </div>
     </div>

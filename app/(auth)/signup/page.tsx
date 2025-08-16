@@ -15,7 +15,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
 import { PRODUCT_NAME } from "@/constants";
-import { signup } from "./actions";
+import { signup } from "@/lib/auth/signup";
 
 export default function Signup() {
   const { email, password, setEmail, setPassword } = useAuthStore();

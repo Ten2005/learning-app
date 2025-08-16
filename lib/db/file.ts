@@ -1,32 +1,37 @@
 import { createClient } from "@/utils/supabase/server";
 import { getUser } from "../auth/user";
 
-export async function getFolders() {
+export async function getFiles() {
   const supabase = await createClient();
   const user = await getUser();
   const { data, error } = await supabase
-    .from("folder")
-    .select("id, name")
+    .from("file")
+    .select("id, title, content, parent_id, page")
     .eq("user_id", user.id)
-    .eq("is_deleted", false);
+    .eq("is_deleted", false)
+    .order("page", { ascending: true });
   if (error) {
     console.error(error);
-    throw new Error("Failed to get folders");
+    throw new Error("Failed to get files");
   }
   return data;
 }
 
-export async function createFolder(name: string) {
+export async function createFile(parent_id: number, page: number) {
   const supabase = await createClient();
   const user = await getUser();
   const { data, error } = await supabase
-    .from("folder")
-    .insert({ name, user_id: user.id })
+    .from("file")
+    .insert({
+      user_id: user.id,
+      parent_id,
+      page,
+    })
     .select()
     .single();
   if (error) {
     console.error(error);
-    throw new Error("Failed to create folder");
+    throw new Error("Failed to create file");
   }
   return data;
 }

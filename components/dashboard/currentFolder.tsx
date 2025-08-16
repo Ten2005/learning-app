@@ -17,7 +17,17 @@ import { useSidebarStore } from "@/store/sidebar";
 
 export default function CurrentFolder() {
   const { currentFolder } = useSidebarStore();
-  if (!currentFolder) return;
+  if (!currentFolder)
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel>Current Folder</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <p className="text-sm text-muted-foreground">
+            Select a folder below to get started.
+          </p>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Current Folder</SidebarGroupLabel>

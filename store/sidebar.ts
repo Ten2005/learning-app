@@ -1,11 +1,10 @@
-
 import { create } from "zustand";
-import { ShowedFolder } from "@/types/sidebar/folder";
+import { UsedFolder } from "@/types/sidebar/folder";
 interface SidebarState {
   newFolderName: string;
   setNewFolderName: (newFolderName: string) => void;
-  currentFolder: ShowedFolder | undefined;
-  setCurrentFolder: (currentFolder: ShowedFolder) => void;
+  currentFolder: UsedFolder | undefined;
+  setCurrentFolder: (currentFolder: UsedFolder) => void;
   isDialogOpen: boolean;
   setIsDialogOpen: (isDialogOpen: boolean) => void;
 }

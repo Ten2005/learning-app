@@ -3,8 +3,10 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
-import { ChevronRightIcon, ChevronLeftIcon, TelescopeIcon } from "lucide-react";
+import { TelescopeIcon} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import CreatePageButton from "@/components/dashboard/createPageButton";
+import PageButtons from "@/components/dashboard/pageButton";
 
 export default function Dashboard() {
   const { currentContent, setCurrentContent, currentTitle } =
@@ -14,14 +16,17 @@ export default function Dashboard() {
     <div className="flex flex-col gap-2 w-full h-full">
       <div className="flex flex-col gap-2 justify-between border-b p-2">
         <div className="flex flex-row justify-between">
-          <Label htmlFor="message-2" className="text-primary">
+          <Label className="text-primary">
             {currentTitle ? currentTitle : "None"}
           </Label>
           <PageButtons />
         </div>
-        <Button variant="outline" size="icon" className="size-6">
-          <TelescopeIcon />
-        </Button>
+        <div className="flex flex-row items-end justify-between">
+          <Button variant="outline" size="icon" className="size-8">
+            <TelescopeIcon />
+          </Button>
+          <CreatePageButton />
+        </div>
       </div>
       <Textarea
         value={currentContent}
@@ -30,19 +35,6 @@ export default function Dashboard() {
         w-full flex-1
         resize-none border-none focus:border-none focus-visible:ring-0"
       />
-    </div>
-  );
-}
-
-function PageButtons() {
-  return (
-    <div className="flex flex-row gap-2">
-      <Button size="icon" variant="ghost" className="size-6">
-        <ChevronLeftIcon />
-      </Button>
-      <Button size="icon" variant="ghost" className="size-6">
-        <ChevronRightIcon />
-      </Button>
     </div>
   );
 }

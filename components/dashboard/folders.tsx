@@ -1,6 +1,6 @@
 "use client";
 
-import { ShowedFolder } from "@/types/sidebar/folder";
+import { UsedFolder } from "@/types/sidebar/folder";
 import { Button } from "../ui/button";
 import { Folder } from "lucide-react";
 import {
@@ -10,8 +10,8 @@ import {
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 
-export default function Folders({ folders }: { folders: ShowedFolder[] }) {
-    const { setCurrentFolder } = useSidebarStore();
+export default function Folders({ folders }: { folders: UsedFolder[] }) {
+  const { setCurrentFolder } = useSidebarStore();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Folders</SidebarGroupLabel>

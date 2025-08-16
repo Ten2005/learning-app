@@ -7,13 +7,13 @@ import {
 
 import NewFolderDialog from "./newFolderDialog";
 import { getFoldersAction } from "@/app/(main)/dashboard/actions";
-import { ShowedFolder } from "@/types/sidebar/folder";
+import { UsedFolder } from "@/types/sidebar/folder";
 import { use } from "react";
 import Folders from "./folders";
 import CurrentFolder from "./currentFolder";
 
 export function DashboardSidebar() {
-  const folders = use(getFoldersAction()) as ShowedFolder[];
+  const folders = use(getFoldersAction()) as UsedFolder[];
   return (
     <Sidebar>
       <SidebarContent>

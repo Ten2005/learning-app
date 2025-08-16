@@ -1,4 +1,4 @@
-export interface ShowedFolder {
+export interface UsedFolder {
   id: number;
   name: string;
 }

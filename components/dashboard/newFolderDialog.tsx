@@ -22,7 +22,7 @@ export default function NewFolderDialog() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full">
+        <Button size="sm" className="w-full">
           <Plus className="w-4 h-4 mr-2" />
           New Folder
         </Button>

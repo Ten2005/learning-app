@@ -7,13 +7,16 @@ interface SidebarState {
   setNewFolderName: (newFolderName: string) => void;
 
   currentFolder: UsedFolder | undefined;
-  setCurrentFolder: (currentFolder: UsedFolder) => void;
+  setCurrentFolder: (currentFolder: UsedFolder | undefined) => void;
 
   folders: UsedFolder[];
   setFolders: (folders: UsedFolder[]) => void;
 
   currentFiles: UsedFile[];
   setCurrentFiles: (currentFiles: UsedFile[]) => void;
+
+  isEditingFolder: boolean;
+  setIsEditingFolder: (isEditingFolder: boolean) => void;
 
   isDialogOpen: boolean;
   setIsDialogOpen: (isDialogOpen: boolean) => void;
@@ -31,6 +34,9 @@ export const useSidebarStore = create<SidebarState>((set) => ({
 
   currentFiles: [],
   setCurrentFiles: (currentFiles) => set({ currentFiles }),
+
+  isEditingFolder: false,
+  setIsEditingFolder: (isEditingFolder) => set({ isEditingFolder }),
 
   isDialogOpen: false,
   setIsDialogOpen: (isDialogOpen) => set({ isDialogOpen }),

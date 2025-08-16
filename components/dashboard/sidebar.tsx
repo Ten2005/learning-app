@@ -6,12 +6,12 @@ import {
 } from "@/components/ui/sidebar";
 
 import NewFolderDialog from "./newFolderDialog";
-import { getFoldersAction } from "@/app/(main)/dashboard/actions";
+import { readFoldersAction } from "@/app/(main)/dashboard/actions";
 import Folders from "./folders";
 import CurrentFolder from "./currentFolder";
 
 export async function DashboardSidebar() {
-  const folders = await getFoldersAction();
+  const folders = await readFoldersAction();
   return (
     <Sidebar>
       <SidebarContent>

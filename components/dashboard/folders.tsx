@@ -2,7 +2,8 @@
 
 import { UsedFolder } from "@/types/sidebar/folder";
 import { Button } from "../ui/button";
-import { Folder } from "lucide-react";
+import { Folder, Trash2Icon } from "lucide-react";
+import { PencilIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,7 +11,11 @@ import {
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
-import { getFilesAction } from "@/app/(main)/dashboard/actions";
+import {
+  deleteFolderAction,
+  readFilesAction,
+  updateFolderAction,
+} from "@/app/(main)/dashboard/actions";
 import { createFileAction } from "@/app/(main)/dashboard/actions";
 
 export default function Folders({ folders }: { folders: UsedFolder[] }) {
@@ -19,7 +24,7 @@ export default function Folders({ folders }: { folders: UsedFolder[] }) {
 
   const changeFolder = async (folder: UsedFolder) => {
     setCurrentFolder(folder);
-    const files = await getFilesAction(folder.id);
+    const files = await readFilesAction(folder.id);
     if (files.length > 0) {
       setCurrentFiles(files);
       setCurrentFile(files[0]);

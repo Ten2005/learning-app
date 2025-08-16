@@ -1,15 +1,12 @@
 import { create } from "zustand";
+import { UsedFile } from "@/types/sidebar/file";
 
 interface DashboardState {
-  currentTitle: string;
-  currentContent: string;
-  setCurrentTitle: (currentTitle: string) => void;
-  setCurrentContent: (currentContent: string) => void;
+  currentFile: UsedFile | undefined;
+  setCurrentFile: (currentFile: UsedFile | undefined) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
-  currentTitle: "",
-  currentContent: "",
-  setCurrentTitle: (currentTitle) => set({ currentTitle }),
-  setCurrentContent: (currentContent) => set({ currentContent }),
+  currentFile: undefined,
+  setCurrentFile: (currentFile) => set({ currentFile }),
 }));

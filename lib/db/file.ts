@@ -1,13 +1,14 @@
 import { createClient } from "@/utils/supabase/server";
 import { getUser } from "../auth/user";
 
-export async function getFiles() {
+export async function getFiles(parent_id: number) {
   const supabase = await createClient();
   const user = await getUser();
   const { data, error } = await supabase
     .from("file")
-    .select("id, title, content, parent_id, page")
+    .select("id, title, content, page")
     .eq("user_id", user.id)
+    .eq("parent_id", parent_id)
     .eq("is_deleted", false)
     .order("page", { ascending: true });
   if (error) {

@@ -14,9 +14,11 @@ import {
 import { Folder } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSidebarStore } from "@/store/sidebar";
+import { useDashboardStore } from "@/store/dashboard";
 
 export default function CurrentFolder() {
-  const { currentFolder } = useSidebarStore();
+  const { currentFolder, currentFiles } = useSidebarStore();
+  const { setCurrentFile } = useDashboardStore();
   if (!currentFolder)
     return (
       <SidebarGroup>
@@ -41,14 +43,17 @@ export default function CurrentFolder() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              {Array.from({ length: 10 }, (_, i) => (
+              {currentFiles.map((file) => (
                 <Button
-                  key={i}
+                  key={file.id}
                   variant="ghost"
                   size="sm"
-                  className="p-0 justify-start w-full"
+                  className="p-0 justify-start w-full text-muted-foreground"
+                  onClick={() => {
+                    setCurrentFile(file);
+                  }}
                 >
-                  Item {i + 1}
+                  {file.page} : {file.title || "None"}
                 </Button>
               ))}
             </AccordionContent>

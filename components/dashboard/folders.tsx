@@ -9,9 +9,27 @@ import {
   SidebarGroupLabel,
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
+import { useDashboardStore } from "@/store/dashboard";
+import { getFilesAction } from "@/app/(main)/dashboard/actions";
+import { createFileAction } from "@/app/(main)/dashboard/actions";
 
 export default function Folders({ folders }: { folders: UsedFolder[] }) {
-  const { setCurrentFolder } = useSidebarStore();
+  const { setCurrentFolder, setCurrentFiles } = useSidebarStore();
+  const { setCurrentFile } = useDashboardStore();
+
+  const changeFolder = async (folder: UsedFolder) => {
+    setCurrentFolder(folder);
+    const files = await getFilesAction(folder.id);
+    if (files.length > 0) {
+      setCurrentFiles(files);
+      setCurrentFile(files[0]);
+    } else {
+      const file = await createFileAction(folder.id, 0);
+      setCurrentFiles([file]);
+      setCurrentFile(file);
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Folders</SidebarGroupLabel>
@@ -22,9 +40,7 @@ export default function Folders({ folders }: { folders: UsedFolder[] }) {
             variant="ghost"
             size="sm"
             className="p-0 justify-start w-full"
-            onClick={() => {
-              setCurrentFolder(folder);
-            }}
+            onClick={() => changeFolder(folder)}
           >
             <div
               id={folder.id.toString()}

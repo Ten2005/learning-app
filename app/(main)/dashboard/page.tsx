@@ -62,7 +62,7 @@ function EditTitle() {
   return (
     <div className="flex flex-row items-center gap-2">
       <Button variant="ghost" size="icon" onClick={handleUpdateTitle}>
-        <CheckIcon className="w-4 h-4 text-muted-foreground" />
+        <CheckIcon className="w-4 h-4 " />
       </Button>
       <Input
         type="text"
@@ -86,7 +86,7 @@ function ShowTitle() {
         size="icon"
         onClick={() => setIsEditingTitle(true)}
       >
-        <PencilIcon className="w-4 h-4 text-muted-foreground" />
+        <PencilIcon className="w-4 h-4" />
       </Button>
       <TitleLabel />
     </div>

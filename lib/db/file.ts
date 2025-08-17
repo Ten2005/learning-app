@@ -66,3 +66,41 @@ export async function deleteFile(id: number) {
   }
   return data;
 }
+
+export async function incrementFilePages(parent_id: number, fromPage: number) {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  const { data: targetFiles, error: fetchError } = await supabase
+    .from("file")
+    .select("id, page")
+    .eq("user_id", user.id)
+    .eq("parent_id", parent_id)
+    .eq("is_deleted", false)
+    .gte("page", fromPage);
+
+  if (fetchError) {
+    console.error("Fetch error:", fetchError);
+    throw new Error("Failed to fetch files for page increment");
+  }
+
+  if (!targetFiles || targetFiles.length === 0) {
+    console.log("No files to increment");
+    return [];
+  }
+
+  targetFiles.map(async (file) => {
+    const { data, error } = await supabase
+      .from("file")
+      .update({ page: file.page + 1 })
+      .eq("id", file.id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error(`Failed to update file ${file.id}:`, error);
+      throw new Error(`Failed to update file ${file.id}`);
+    }
+
+    return data;
+  });
+}

@@ -15,6 +15,8 @@ interface SidebarState {
   currentFiles: UsedFile[];
   setCurrentFiles: (currentFiles: UsedFile[]) => void;
 
+  insertFileAfterCurrent: (newFile: UsedFile, currentPage: number) => void;
+
   isEditingFolder: boolean;
   setIsEditingFolder: (isEditingFolder: boolean) => void;
 
@@ -34,6 +36,19 @@ export const useSidebarStore = create<SidebarState>((set) => ({
 
   currentFiles: [],
   setCurrentFiles: (currentFiles) => set({ currentFiles }),
+
+  insertFileAfterCurrent: (newFile, currentPage) =>
+    set((state) => {
+      const updatedFiles = state.currentFiles.map((file) =>
+        file.page > currentPage ? { ...file, page: file.page + 1 } : file,
+      );
+
+      updatedFiles.push(newFile);
+
+      return {
+        currentFiles: updatedFiles.sort((a, b) => a.page - b.page),
+      };
+    }),
 
   isEditingFolder: false,
   setIsEditingFolder: (isEditingFolder) => set({ isEditingFolder }),

@@ -6,7 +6,13 @@ import {
   updateFolder,
   deleteFolder,
 } from "@/lib/db/folder";
-import { createFile, deleteFile, readFiles, updateFile } from "@/lib/db/file";
+import {
+  createFile,
+  deleteFile,
+  readFiles,
+  updateFile,
+  incrementFilePages,
+} from "@/lib/db/file";
 import { revalidatePath } from "next/cache";
 
 export async function createFolderAction(name: string) {
@@ -60,6 +66,22 @@ export async function createFileAction(parent_id: number, page: number) {
   } catch (error) {
     console.error("Error creating file:", error);
     throw new Error("Failed to create file");
+  }
+}
+
+export async function createFileAfterCurrentAction(
+  parent_id: number,
+  currentPage: number,
+) {
+  try {
+    await incrementFilePages(parent_id, currentPage + 1);
+
+    const file = await createFile(parent_id, currentPage + 1);
+    revalidatePath("/dashboard");
+    return file;
+  } catch (error) {
+    console.error("Error in createFileAfterCurrentAction:", error);
+    throw new Error("Failed to create file after current");
   }
 }
 

@@ -2,8 +2,7 @@
 
 import { UsedFolder } from "@/types/sidebar/folder";
 import { Button } from "../ui/button";
-import { Folder, Trash2Icon } from "lucide-react";
-import { PencilIcon } from "lucide-react";
+import { Folder } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -11,11 +10,7 @@ import {
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
-import {
-  deleteFolderAction,
-  readFilesAction,
-  updateFolderAction,
-} from "@/app/(main)/dashboard/actions";
+import { readFilesAction } from "@/app/(main)/dashboard/actions";
 import { createFileAction } from "@/app/(main)/dashboard/actions";
 
 export default function Folders({ folders }: { folders: UsedFolder[] }) {

@@ -48,13 +48,21 @@ function EditTitle() {
   const { currentFile, setCurrentFile, setIsEditingTitle } =
     useDashboardStore();
 
-  const handleUpdateTitle = () => {
+  const { currentFiles, setCurrentFiles } = useSidebarStore();
+
+  const handleUpdateTitle = async () => {
     setIsEditingTitle(false);
     if (currentFile) {
-      updateFileAction(
+      await updateFileAction(
         currentFile.id,
         currentFile.title || "",
         currentFile.content || "",
+      );
+      setCurrentFiles(currentFiles.map((file) =>
+          file.id === currentFile.id
+            ? { ...file, title: currentFile.title }
+            : file,
+        ),
       );
     }
   };

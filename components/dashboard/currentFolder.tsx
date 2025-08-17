@@ -19,13 +19,25 @@ import {
   deleteFolderAction,
   deleteFileAction,
   updateFolderAction,
+  createFileAction,
 } from "@/app/(main)/dashboard/actions";
 import { Input } from "../ui/input";
 import { UsedFolder } from "@/types/sidebar/folder";
 
 export default function CurrentFolder() {
-  const { currentFolder, currentFiles } = useSidebarStore();
+  const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
+
+  const handleDeleteFile = async (fileId: number) => {
+    await deleteFileAction(fileId);
+    const filteredFiles = currentFiles.filter((file) => file.id !== fileId);
+    await setCurrentFiles(filteredFiles);
+    if (filteredFiles.length === 0 && currentFolder) {
+      const file = await createFileAction(currentFolder.id, 0);
+      setCurrentFiles([file]);
+      setCurrentFile(file);
+    }
+  };
 
   if (!currentFolder)
     return (
@@ -73,7 +85,7 @@ export default function CurrentFolder() {
                     variant="ghost"
                     className="text-destructive"
                     onClick={() => {
-                      deleteFileAction(file.id);
+                      handleDeleteFile(file.id);
                     }}
                   >
                     <Trash2Icon className="w-4 h-4" />

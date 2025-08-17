@@ -12,8 +12,15 @@ import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 
 export default function Dashboard() {
-  const { currentFile, setCurrentFile, isEditingTitle } = useDashboardStore();
+  const { currentFile, setCurrentFile, isEditingTitle, isTextAreaDisabled } =
+    useDashboardStore();
   const { currentFolder } = useSidebarStore();
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (currentFile) {
+      setCurrentFile({ ...currentFile, content: e.target.value });
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">
@@ -28,19 +35,58 @@ export default function Dashboard() {
           </Button>
           <CreatePageButton />
         </div>
+        <div className="flex flex-row border-t pt-2">
+          <EditTextAreaButton />
+        </div>
       </div>
       <Textarea
         value={currentFile?.content || ""}
-        onChange={(e) => {
-          if (currentFile) {
-            setCurrentFile({ ...currentFile, content: e.target.value });
-          }
-        }}
+        onChange={handleTextAreaChange}
+        disabled={isTextAreaDisabled || !currentFile}
         className="
         w-full flex-1
         resize-none border-none focus:border-none focus-visible:ring-0"
       />
     </div>
+  );
+}
+
+function EditTextAreaButton() {
+  const { setIsTextAreaDisabled, isTextAreaDisabled, currentFile } =
+    useDashboardStore();
+  const { currentFiles, setCurrentFiles } = useSidebarStore();
+
+  const handleSave = async () => {
+    setIsTextAreaDisabled(true);
+    if (currentFile) {
+      await updateFileAction(
+        currentFile.id,
+        currentFile.title || "",
+        currentFile.content || "",
+      );
+      setCurrentFiles(
+        currentFiles.map((file) =>
+          file.id === currentFile.id
+            ? { ...file, content: currentFile.content }
+            : file,
+        ),
+      );
+    }
+  };
+
+  return isTextAreaDisabled ? (
+    <Button
+      size="sm"
+      variant="secondary"
+      disabled={!currentFile}
+      onClick={() => setIsTextAreaDisabled(false)}
+    >
+      Edit
+    </Button>
+  ) : (
+    <Button size="sm" onClick={handleSave} disabled={!currentFile}>
+      Save
+    </Button>
   );
 }
 
@@ -58,7 +104,8 @@ function EditTitle() {
         currentFile.title || "",
         currentFile.content || "",
       );
-      setCurrentFiles(currentFiles.map((file) =>
+      setCurrentFiles(
+        currentFiles.map((file) =>
           file.id === currentFile.id
             ? { ...file, title: currentFile.title }
             : file,

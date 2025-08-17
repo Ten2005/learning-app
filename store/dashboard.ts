@@ -7,6 +7,9 @@ interface DashboardState {
 
   isEditingTitle: boolean;
   setIsEditingTitle: (isEditingTitle: boolean) => void;
+
+  isTextAreaDisabled: boolean;
+  setIsTextAreaDisabled: (isTextAreaDisabled: boolean) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -15,4 +18,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
 
   isEditingTitle: false,
   setIsEditingTitle: (isEditingTitle) => set({ isEditingTitle }),
+
+  isTextAreaDisabled: true,
+  setIsTextAreaDisabled: (isTextAreaDisabled) => set({ isTextAreaDisabled }),
 }));

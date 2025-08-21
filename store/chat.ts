@@ -23,7 +23,8 @@ export const useChatStore = create<ChatStore>((set) => ({
   setInput: (input) => set({ input }),
 
   messages: [],
-  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
+  addMessage: (message) =>
+    set((state) => ({ messages: [...state.messages, message] })),
   clearMessages: () => set({ messages: [] }),
 
   isSending: false,

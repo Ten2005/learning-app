@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "bookGen",
-  description: "bookGen is a platform for creating books",
+  title: "NeoTom",
+  description: "NeoTom is a platform for creating books",
 };
 
 export default function RootLayout({

@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { TelescopeIcon, Loader2Icon } from "lucide-react";
+import { TelescopeIcon, Loader2Icon, XIcon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,15 @@ import { searchAction } from "@/app/(main)/dashboard/actions";
 
 export function SearchSheet() {
   const { currentFile } = useDashboardStore();
-  const { messages, input, addMessage, setInput, setIsSending, isSending } = useChatStore();
+  const {
+    messages,
+    input,
+    addMessage,
+    setInput,
+    setIsSending,
+    isSending,
+    clearMessages,
+  } = useChatStore();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,7 +34,11 @@ export function SearchSheet() {
     await addMessage({ id: crypto.randomUUID(), content: input, isUser: true });
     setInput("");
     const response = await searchAction(messages);
-    await addMessage({ id: crypto.randomUUID(), content: response, isUser: false });
+    await addMessage({
+      id: crypto.randomUUID(),
+      content: response,
+      isUser: false,
+    });
     await setIsSending(false);
   };
 
@@ -40,18 +52,42 @@ export function SearchSheet() {
       <SheetContent side="bottom" className="h-screen">
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
-          <SheetDescription>Search for a query.</SheetDescription>
+          <div className="flex items-center">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => clearMessages()}
+              disabled={messages.length === 0}
+            >
+              Clear Chat
+            </Button>
+          </div>
         </SheetHeader>
         <div className="flex flex-col gap-4 p-4 overflow-y-auto">
           {messages.map((message) => (
-            <Message key={message.id} content={message.content} isUser={message.isUser} />
+            <Message
+              key={message.id}
+              content={message.content}
+              isUser={message.isUser}
+            />
           ))}
         </div>
         <SheetFooter>
-          <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-            <Input value={input} onChange={(e) => setInput(e.target.value)} disabled={isSending} />
+          <form
+            onSubmit={handleSubmit}
+            className="flex w-full items-center gap-2"
+          >
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isSending}
+            />
             <Button type="submit" size="icon" disabled={isSending || !input}>
-              {isSending ? <Loader2Icon className="size-4 animate-spin" /> : <SearchIcon className="size-4" />}
+              {isSending ? (
+                <Loader2Icon className="size-4 animate-spin" />
+              ) : (
+                <SearchIcon className="size-4" />
+              )}
             </Button>
           </form>
         </SheetFooter>

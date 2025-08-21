@@ -97,12 +97,12 @@ function EditTitle() {
 
 function ShowTitle() {
   const { currentFile } = useDashboardStore();
+  const { currentFolder } = useSidebarStore();
   const { setIsEditingTitle } = useDashboardStore();
   return (
-    <div className="flex flex-row items-center gap-4">
-      <span className="text-xs text-muted-foreground">
-        {currentFile?.page}/
-      </span>
+    <div className="flex flex-row items-center">
+      <span className="text-xs text-muted-foreground px-1">({currentFolder?.name})</span>
+      <span className="text-xs text-muted-foreground px-1">{currentFile?.page}</span>
       {currentFile?.title ? (
         <Button
           variant="ghost"

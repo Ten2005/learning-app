@@ -1,1 +1,1 @@
-export const PRODUCT_NAME = "bookGen";
+export const PRODUCT_NAME = "NeoTome";

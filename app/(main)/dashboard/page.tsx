@@ -24,20 +24,20 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">
-      <div className="flex flex-col gap-2 justify-between border-b p-2">
+      <div className="flex flex-col justify-between border-b p-2">
         <div className="flex flex-row justify-between">
-          {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
           {currentFolder && <PageButtons />}
+          {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
         </div>
-        <div className="flex flex-row items-end justify-between">
-          <Button variant="outline" size="icon" className="size-8">
-            <TelescopeIcon />
-          </Button>
+        <div className="flex flex-row justify-between border-t pt-2">
           <CreatePageButton />
-        </div>
-        <div className="flex flex-row border-t pt-2">
           <EditTextAreaButton />
         </div>
+      </div>
+      <div className="flex flex-row justify-end px-2">
+        <Button variant="outline" size="icon" className="size-8">
+          <TelescopeIcon />
+        </Button>
       </div>
       <Textarea
         value={currentFile?.content || ""}
@@ -116,9 +116,6 @@ function EditTitle() {
 
   return (
     <div className="flex flex-row items-center gap-2">
-      <Button variant="ghost" size="icon" onClick={handleUpdateTitle}>
-        <CheckIcon className="w-4 h-4 " />
-      </Button>
       <Input
         type="text"
         value={currentFile?.title || ""}
@@ -128,6 +125,9 @@ function EditTitle() {
           }
         }}
       />
+      <Button variant="ghost" size="icon" onClick={handleUpdateTitle}>
+        <CheckIcon className="w-4 h-4 " />
+      </Button>
     </div>
   );
 }
@@ -136,6 +136,7 @@ function ShowTitle() {
   const { setIsEditingTitle } = useDashboardStore();
   return (
     <div className="flex flex-row items-center gap-2">
+      <TitleLabel />
       <Button
         variant="ghost"
         size="icon"
@@ -143,7 +144,6 @@ function ShowTitle() {
       >
         <PencilIcon className="w-4 h-4" />
       </Button>
-      <TitleLabel />
     </div>
   );
 }

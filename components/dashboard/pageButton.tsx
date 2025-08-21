@@ -19,7 +19,7 @@ export default function PageButtons() {
     <div className="flex flex-row gap-2">
       <Button
         size="icon"
-        variant="ghost"
+        variant="secondary"
         className="size-8"
         onClick={() => handlePageChange(currentFile.page - 1)}
         disabled={currentFile.page === 0}
@@ -28,7 +28,7 @@ export default function PageButtons() {
       </Button>
       <Button
         size="icon"
-        variant="ghost"
+        variant="secondary"
         className="size-8"
         onClick={() => handlePageChange(currentFile.page + 1)}
         disabled={currentFile.page === currentFiles.length - 1}

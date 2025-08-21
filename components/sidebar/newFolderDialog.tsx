@@ -16,8 +16,23 @@ import { useSidebarStore } from "@/store/sidebar";
 import { createFolderAction } from "@/app/(main)/dashboard/actions";
 
 export default function NewFolderDialog() {
-  const { newFolderName, setNewFolderName, isDialogOpen, setIsDialogOpen } =
-    useSidebarStore();
+  const {
+    newFolderName,
+    setNewFolderName,
+    isDialogOpen,
+    setIsDialogOpen,
+    isCreatingFolder,
+    setIsCreatingFolder,
+  } = useSidebarStore();
+
+  const handleCreateFolder = async () => {
+    if (newFolderName === "") return;
+    await setIsCreatingFolder(true);
+    await createFolderAction(newFolderName);
+    setNewFolderName("");
+    setIsDialogOpen(false);
+    setIsCreatingFolder(false);
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -44,12 +59,8 @@ export default function NewFolderDialog() {
           <Button
             type="submit"
             size="sm"
-            disabled={newFolderName === ""}
-            onClick={async () => {
-              await createFolderAction(newFolderName);
-              setNewFolderName("");
-              setIsDialogOpen(false);
-            }}
+            disabled={newFolderName === "" || !isDialogOpen || isCreatingFolder}
+            onClick={handleCreateFolder}
           >
             Create
           </Button>

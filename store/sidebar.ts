@@ -22,6 +22,12 @@ interface SidebarState {
 
   isDialogOpen: boolean;
   setIsDialogOpen: (isDialogOpen: boolean) => void;
+
+  isCreatingFolder: boolean;
+  setIsCreatingFolder: (isCreatingFolder: boolean) => void;
+
+  isDeleting: boolean;
+  setIsDeleting: (isDeletingFile: boolean) => void;
 }
 
 export const useSidebarStore = create<SidebarState>((set) => ({
@@ -55,4 +61,10 @@ export const useSidebarStore = create<SidebarState>((set) => ({
 
   isDialogOpen: false,
   setIsDialogOpen: (isDialogOpen) => set({ isDialogOpen }),
+
+  isCreatingFolder: false,
+  setIsCreatingFolder: (isCreatingFolder) => set({ isCreatingFolder }),
+
+  isDeleting: false,
+  setIsDeleting: (isDeleting) => set({ isDeleting }),
 }));

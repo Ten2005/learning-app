@@ -7,8 +7,8 @@ import {
 
 import NewFolderDialog from "./newFolderDialog";
 import { readFoldersAction } from "@/app/(main)/dashboard/actions";
-import Folders from "./folders";
-import CurrentFolder from "./currentFolder";
+import Folders from "@/components/sidebar/folders";
+import CurrentFolder from "@/components/sidebar/currentFolder";
 
 export async function DashboardSidebar() {
   const folders = await readFoldersAction();

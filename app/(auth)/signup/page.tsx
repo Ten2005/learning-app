@@ -18,7 +18,13 @@ import { PRODUCT_NAME } from "@/constants";
 import { signup } from "@/lib/auth/signup";
 
 export default function Signup() {
-  const { email, password, setEmail, setPassword } = useAuthStore();
+  const { email, password, setEmail, setPassword, isLoading, setIsLoading } =
+    useAuthStore();
+
+  const handleSignup = async () => {
+    await setIsLoading(true);
+    await signup(email, password);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen p-2">
@@ -57,7 +63,8 @@ export default function Signup() {
             <Button
               size={"sm"}
               type="submit"
-              onClick={() => signup(email, password)}
+              onClick={handleSignup}
+              disabled={isLoading}
             >
               Signup
             </Button>

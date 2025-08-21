@@ -3,13 +3,14 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
-import { CheckIcon, PencilIcon, TelescopeIcon } from "lucide-react";
+import { CheckIcon, TelescopeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CreatePageButton from "@/components/dashboard/createPageButton";
 import PageButtons from "@/components/dashboard/pageButton";
 import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
+import EditTextAreaButton from "@/components/dashboard/editTextAreaButton";
 
 export default function Dashboard() {
   const { currentFile, setCurrentFile, isEditingTitle, isTextAreaDisabled } =
@@ -49,45 +50,6 @@ export default function Dashboard() {
         resize-none border-none focus:border-none focus-visible:ring-0"
       />
     </div>
-  );
-}
-
-function EditTextAreaButton() {
-  const { setIsTextAreaDisabled, isTextAreaDisabled, currentFile } =
-    useDashboardStore();
-  const { currentFiles, setCurrentFiles } = useSidebarStore();
-
-  const handleSave = async () => {
-    setIsTextAreaDisabled(true);
-    if (currentFile) {
-      await updateFileAction(
-        currentFile.id,
-        currentFile.title || "",
-        currentFile.content || "",
-      );
-      setCurrentFiles(
-        currentFiles.map((file) =>
-          file.id === currentFile.id
-            ? { ...file, content: currentFile.content }
-            : file,
-        ),
-      );
-    }
-  };
-
-  return isTextAreaDisabled ? (
-    <Button
-      size="sm"
-      variant="secondary"
-      disabled={!currentFile}
-      onClick={() => setIsTextAreaDisabled(false)}
-    >
-      Edit
-    </Button>
-  ) : (
-    <Button size="sm" onClick={handleSave} disabled={!currentFile}>
-      Save
-    </Button>
   );
 }
 
@@ -134,26 +96,32 @@ function EditTitle() {
 }
 
 function ShowTitle() {
-  return (
-    <div className="flex flex-row items-center">
-      <TitleLabel />
-    </div>
-  );
-}
-
-function TitleLabel() {
   const { currentFile } = useDashboardStore();
   const { setIsEditingTitle } = useDashboardStore();
-  return currentFile?.title ? (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => setIsEditingTitle(true)}
-      asChild
-    >
-      <Label className="text-primary">{currentFile?.title}</Label>
-    </Button>
-  ) : (
-    <Label className="text-muted-foreground">None</Label>
+  return (
+    <div className="flex flex-row items-center gap-4">
+      <span className="text-xs text-muted-foreground">
+        {currentFile?.page}/
+      </span>
+      {currentFile?.title ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsEditingTitle(true)}
+          asChild
+        >
+          <Label className="text-primary"> {currentFile?.title}</Label>
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsEditingTitle(true)}
+          asChild
+        >
+          <Label className="text-muted-foreground">None</Label>
+        </Button>
+      )}
+    </div>
   );
 }

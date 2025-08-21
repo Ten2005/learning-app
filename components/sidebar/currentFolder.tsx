@@ -11,7 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { CheckIcon, Folder, PencilIcon, Trash2Icon } from "lucide-react";
+import { CheckIcon, Folder, PencilIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
@@ -23,12 +23,15 @@ import {
 } from "@/app/(main)/dashboard/actions";
 import { Input } from "../ui/input";
 import { UsedFolder } from "@/types/sidebar/folder";
+import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 
 export default function CurrentFolder() {
-  const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
+  const { currentFolder, currentFiles, setCurrentFiles, setIsDeleting } =
+    useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
 
   const handleDeleteFile = async (fileId: number) => {
+    await setIsDeleting(true);
     await deleteFileAction(fileId);
     const filteredFiles = currentFiles.filter((file) => file.id !== fileId);
     await setCurrentFiles(filteredFiles);
@@ -37,6 +40,7 @@ export default function CurrentFolder() {
       setCurrentFiles([file]);
       setCurrentFile(file);
     }
+    await setIsDeleting(false);
   };
 
   if (!currentFolder)
@@ -80,16 +84,9 @@ export default function CurrentFolder() {
                   >
                     {file.page} : {file.title || "None"}
                   </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-destructive"
-                    onClick={() => {
-                      handleDeleteFile(file.id);
-                    }}
-                  >
-                    <Trash2Icon className="w-4 h-4" />
-                  </Button>
+                  <DeleteConfirmationDialog
+                    deleteFunction={() => handleDeleteFile(file.id)}
+                  />
                 </div>
               ))}
             </AccordionContent>
@@ -139,14 +136,7 @@ function EditFolder({ currentFolder }: { currentFolder: UsedFolder }) {
             <PencilIcon className="w-4 h-4" />
           )}
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDeleteFolder}
-          className="text-destructive"
-        >
-          <Trash2Icon className="w-4 h-4" />
-        </Button>
+        <DeleteConfirmationDialog deleteFunction={handleDeleteFolder} />
       </div>
     </div>
   );

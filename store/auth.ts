@@ -5,6 +5,8 @@ interface AuthFormState {
   password: string;
   setEmail: (email: string) => void;
   setPassword: (password: string) => void;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export const useAuthStore = create<AuthFormState>((set) => ({
@@ -12,4 +14,6 @@ export const useAuthStore = create<AuthFormState>((set) => ({
   password: "",
   setEmail: (email) => set({ email }),
   setPassword: (password) => set({ password }),
+  isLoading: false,
+  setIsLoading: (isLoading) => set({ isLoading }),
 }));

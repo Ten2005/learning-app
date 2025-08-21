@@ -52,6 +52,9 @@ export function SearchSheet() {
       <SheetContent side="bottom" className="h-screen">
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
+          <SheetDescription>
+            Some description here.
+          </SheetDescription>
           <div className="flex items-center">
             <Button
               variant="secondary"

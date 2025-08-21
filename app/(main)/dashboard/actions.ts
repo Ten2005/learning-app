@@ -14,6 +14,8 @@ import {
   incrementFilePages,
 } from "@/lib/db/file";
 import { revalidatePath } from "next/cache";
+import { chat } from "@/lib/ai/openai";
+import { UIMessage, Message } from "@/types/chat/message";
 
 export async function createFolderAction(name: string) {
   try {
@@ -118,5 +120,19 @@ export async function deleteFileAction(id: number) {
   } catch (error) {
     console.error("Error deleting file:", error);
     throw new Error("Failed to delete file");
+  }
+}
+
+export async function searchAction(uiMessages: UIMessage[]) {
+  const messages: Message[] = uiMessages.map((message) => ({
+    role: message.isUser ? "user" : "assistant",
+    content: message.content,
+  }));
+  try {
+    const response = await chat(messages);
+    return response;
+  } catch (error) {
+    console.error("Error searching:", error);
+    throw new Error("Failed to search");
   }
 }

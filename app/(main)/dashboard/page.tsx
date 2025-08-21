@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 import EditTextAreaButton from "@/components/dashboard/editTextAreaButton";
+import { SearchSheet } from "@/components/dashboard/searchSheet";
 
 export default function Dashboard() {
   const { currentFile, setCurrentFile, isEditingTitle, isTextAreaDisabled } =
@@ -35,9 +36,7 @@ export default function Dashboard() {
           <EditTextAreaButton />
         </div>
         <div className="flex flex-row justify-end pt-1">
-          <Button variant="outline" size="icon" className="size-8">
-            <TelescopeIcon />
-          </Button>
+          <SearchSheet />
         </div>
       </div>
 
@@ -101,8 +100,12 @@ function ShowTitle() {
   const { setIsEditingTitle } = useDashboardStore();
   return (
     <div className="flex flex-row items-center">
-      <span className="text-xs text-muted-foreground px-1">({currentFolder?.name})</span>
-      <span className="text-xs text-muted-foreground px-1">{currentFile?.page}</span>
+      <span className="text-xs text-muted-foreground px-1">
+        ({currentFolder?.name})
+      </span>
+      <span className="text-xs text-muted-foreground px-1">
+        {currentFile?.page}
+      </span>
       {currentFile?.title ? (
         <Button
           variant="ghost"

@@ -23,22 +23,23 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full">
-      <div className="flex flex-col justify-between border-b p-2">
-        <div className="flex flex-row justify-between">
+    <div className="flex flex-col w-full h-full">
+      <div className="flex flex-col justify-between py-1 px-2">
+        <div className="flex flex-row justify-between border-b pb-1">
           {currentFolder && <PageButtons />}
           {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
         </div>
-        <div className="flex flex-row justify-between border-t pt-2">
+        <div className="flex flex-row justify-between border-b py-1">
           <CreatePageButton />
           <EditTextAreaButton />
         </div>
+        <div className="flex flex-row justify-end pt-1">
+          <Button variant="outline" size="icon" className="size-8">
+            <TelescopeIcon />
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-row justify-end px-2">
-        <Button variant="outline" size="icon" className="size-8">
-          <TelescopeIcon />
-        </Button>
-      </div>
+
       <Textarea
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}
@@ -115,7 +116,7 @@ function EditTitle() {
   };
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-1">
       <Input
         type="text"
         value={currentFile?.title || ""}
@@ -126,32 +127,32 @@ function EditTitle() {
         }}
       />
       <Button variant="ghost" size="icon" onClick={handleUpdateTitle}>
-        <CheckIcon className="w-4 h-4 " />
+        <CheckIcon className="w-4 h-4" />
       </Button>
     </div>
   );
 }
 
 function ShowTitle() {
-  const { setIsEditingTitle } = useDashboardStore();
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center">
       <TitleLabel />
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setIsEditingTitle(true)}
-      >
-        <PencilIcon className="w-4 h-4" />
-      </Button>
     </div>
   );
 }
 
 function TitleLabel() {
   const { currentFile } = useDashboardStore();
+  const { setIsEditingTitle } = useDashboardStore();
   return currentFile?.title ? (
-    <Label className="text-primary">{currentFile?.title}</Label>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setIsEditingTitle(true)}
+      asChild
+    >
+      <Label className="text-primary">{currentFile?.title}</Label>
+    </Button>
   ) : (
     <Label className="text-muted-foreground">None</Label>
   );

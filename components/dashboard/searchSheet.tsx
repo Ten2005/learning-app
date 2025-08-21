@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { TelescopeIcon, Loader2Icon, XIcon } from "lucide-react";
+import { TelescopeIcon, Loader2Icon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -52,9 +52,7 @@ export function SearchSheet() {
       <SheetContent side="bottom" className="h-screen">
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
-          <SheetDescription>
-            Some description here.
-          </SheetDescription>
+          <SheetDescription>Some description here.</SheetDescription>
           <div className="flex items-center">
             <Button
               variant="secondary"

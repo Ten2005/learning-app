@@ -3,7 +3,7 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
-import { CheckIcon, TelescopeIcon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CreatePageButton from "@/components/dashboard/createPageButton";
 import PageButtons from "@/components/dashboard/pageButton";

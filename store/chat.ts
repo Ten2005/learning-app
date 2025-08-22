@@ -16,6 +16,9 @@ interface ChatStore {
 
   isAdding: boolean;
   setIsAdding: (isAdding: boolean) => void;
+
+  isIncludeContext: boolean;
+  setIsIncludeContext: (isIncludeContext: boolean) => void;
 }
 
 interface Message {
@@ -41,4 +44,7 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   isAdding: false,
   setIsAdding: (isAdding) => set({ isAdding }),
+
+  isIncludeContext: true,
+  setIsIncludeContext: (isIncludeContext) => set({ isIncludeContext }),
 }));

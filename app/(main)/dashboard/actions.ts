@@ -123,13 +123,16 @@ export async function deleteFileAction(id: number) {
   }
 }
 
-export async function searchAction(uiMessages: UIMessage[]) {
+export async function searchAction(
+  uiMessages: UIMessage[],
+  systemPrompt: string = "",
+) {
   const messages: Message[] = uiMessages.map((message) => ({
     role: message.isUser ? "user" : "assistant",
     content: message.content,
   }));
   try {
-    const response = await chat(messages);
+    const response = await chat(messages, systemPrompt);
     return response;
   } catch (error) {
     console.error("Error searching:", error);

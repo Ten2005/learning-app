@@ -19,7 +19,11 @@ export function Message({
         ...currentFile,
         content: currentFile.content + "\n\n" + content,
       };
-      await updateFileAction(currentFile.id, updatedFile.title, updatedFile.content);
+      await updateFileAction(
+        currentFile.id,
+        updatedFile.title,
+        updatedFile.content,
+      );
       setCurrentFile(updatedFile);
     }
   };

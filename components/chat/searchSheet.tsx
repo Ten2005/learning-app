@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import {
   Sheet,
@@ -15,6 +17,10 @@ import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { searchAction } from "@/app/(main)/dashboard/actions";
 import { Message } from "./message";
+import {
+  DEFAULT_SYSTEM_PROMPT,
+  FILE_INCLUDE_SYSTEM_PROMPT_PREFIX,
+} from "@/constants";
 
 export function SearchSheet() {
   const { currentFile } = useDashboardStore();
@@ -26,6 +32,8 @@ export function SearchSheet() {
     setIsSending,
     isSending,
     clearMessages,
+    isIncludeContext,
+    setIsIncludeContext,
   } = useChatStore();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,7 +41,12 @@ export function SearchSheet() {
     await setIsSending(true);
     await addMessage({ id: crypto.randomUUID(), content: input, isUser: true });
     setInput("");
-    const response = await searchAction(messages);
+    const response = await searchAction(
+      messages,
+      isIncludeContext
+        ? FILE_INCLUDE_SYSTEM_PROMPT_PREFIX + currentFile?.content
+        : DEFAULT_SYSTEM_PROMPT,
+    );
     await addMessage({
       id: crypto.randomUUID(),
       content: response,
@@ -53,7 +66,7 @@ export function SearchSheet() {
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
           <SheetDescription>Some description here.</SheetDescription>
-          <div className="flex items-center">
+          <div className="flex w-full justify-between items-center">
             <Button
               variant="secondary"
               size="sm"
@@ -62,6 +75,19 @@ export function SearchSheet() {
             >
               Clear Chat
             </Button>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="include-context"
+                checked={isIncludeContext}
+                onCheckedChange={setIsIncludeContext}
+              />
+              <Label
+                htmlFor="include-context"
+                className={isIncludeContext ? "text-primary" : ""}
+              >
+                Include current file as context
+              </Label>
+            </div>
           </div>
         </SheetHeader>
         <div className="flex flex-col gap-4 p-4 overflow-y-auto">

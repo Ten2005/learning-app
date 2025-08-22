@@ -24,6 +24,7 @@ import {
 import { Input } from "../ui/input";
 import { UsedFolder } from "@/types/sidebar/folder";
 import DeleteConfirmationDialog from "./deleteConfirmationDialog";
+import CreatePageButton from "./createPageButton";
 
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles, setIsDeleting } =
@@ -92,6 +93,7 @@ export default function CurrentFolder() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        <CreatePageButton />
       </SidebarGroupContent>
     </SidebarGroup>
   );

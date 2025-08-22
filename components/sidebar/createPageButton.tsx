@@ -24,16 +24,15 @@ export default function CreatePageButton() {
   };
 
   return (
-    <div>
-      <Button
-        size="sm"
-        variant="secondary"
-        disabled={!currentFolder || !currentFile || isLoading}
-        onClick={handleCreateFile}
-      >
-        <PlusIcon />
-        New Page
-      </Button>
-    </div>
+    <Button
+      size="sm"
+      variant="outline"
+      disabled={!currentFolder || !currentFile || isLoading}
+      onClick={handleCreateFile}
+      className="w-full"
+    >
+      <PlusIcon />
+      New Page
+    </Button>
   );
 }

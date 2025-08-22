@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
 import { CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import CreatePageButton from "@/components/dashboard/createPageButton";
 import PageButtons from "@/components/dashboard/pageButton";
 import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
@@ -28,18 +27,14 @@ export default function Dashboard() {
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
       <div className="flex flex-col justify-between py-1 px-2">
         <div className="flex flex-row justify-between border-b pb-1">
-          {currentFolder && <PageButtons />}
           {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
+          {currentFolder && <PageButtons />}
         </div>
-        <div className="flex flex-row justify-between border-b py-1">
-          <CreatePageButton />
+        <div className="flex flex-row justify-between items-center border-b py-1">
+          <SearchSheet />
           <EditTextAreaButton />
         </div>
-        <div className="flex flex-row justify-end pt-1">
-          <SearchSheet />
-        </div>
       </div>
-
       <Textarea
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}

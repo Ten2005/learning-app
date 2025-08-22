@@ -45,6 +45,6 @@ export const useChatStore = create<ChatStore>((set) => ({
   isAdding: false,
   setIsAdding: (isAdding) => set({ isAdding }),
 
-  isIncludeContext: true,
+  isIncludeContext: false,
   setIsIncludeContext: (isIncludeContext) => set({ isIncludeContext }),
 }));

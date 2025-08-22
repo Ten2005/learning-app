@@ -1,6 +1,6 @@
 "use client";
 
-import { UsedFolder } from "@/types/sidebar/folder";
+import { UsedFolder } from "@/store/sidebar";
 import { Button } from "../ui/button";
 import { Folder } from "lucide-react";
 import {

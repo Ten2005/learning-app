@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { UsedFile } from "@/types/sidebar/file";
+import { UsedFile } from "@/store/sidebar";
 
 interface DashboardState {
   currentFile: UsedFile | undefined;

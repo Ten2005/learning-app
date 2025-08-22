@@ -1,6 +1,16 @@
 import { create } from "zustand";
-import { UsedFolder } from "@/types/sidebar/folder";
-import { UsedFile } from "@/types/sidebar/file";
+
+export interface UsedFolder {
+  id: number;
+  name: string;
+}
+
+export interface UsedFile {
+  id: number;
+  title: string;
+  content: string;
+  page: number;
+}
 
 interface SidebarState {
   newFolderName: string;

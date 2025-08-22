@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import AddConfirmationDialog from "./addConfirmationDialog";
 import { useDashboardStore } from "@/store/dashboard";
-import { UsedFile } from "@/types/sidebar/file";
+import { UsedFile } from "@/store/sidebar";
 import { updateFileAction } from "@/app/(main)/dashboard/actions";
 
 export function Message({

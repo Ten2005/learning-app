@@ -22,7 +22,7 @@ import {
   createFileAction,
 } from "@/app/(main)/dashboard/actions";
 import { Input } from "../ui/input";
-import { UsedFolder } from "@/types/sidebar/folder";
+import { UsedFolder } from "@/store/sidebar";
 import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 import CreatePageButton from "./createPageButton";
 

@@ -1,11 +1,21 @@
 import { create } from "zustand";
 
+export interface Message {
+  role: "user" | "assistant" | "developer";
+  content: string;
+}
+
+export interface UIMessage {
+  id: string;
+  content: string;
+  isUser: boolean;
+}
 interface ChatStore {
   input: string;
   setInput: (input: string) => void;
 
-  messages: Message[];
-  addMessage: (message: Message) => void;
+  messages: UIMessage[];
+  addMessage: (message: UIMessage) => void;
   clearMessages: () => void;
 
   isSending: boolean;
@@ -21,19 +31,14 @@ interface ChatStore {
   setIsIncludeContext: (isIncludeContext: boolean) => void;
 }
 
-interface Message {
-  id: string;
-  content: string;
-  isUser: boolean;
-}
-
 export const useChatStore = create<ChatStore>((set) => ({
   input: "",
   setInput: (input) => set({ input }),
 
   messages: [],
-  addMessage: (message) =>
-    set((state) => ({ messages: [...state.messages, message] })),
+  addMessage: (message) => {
+    set((state) => ({ messages: [...state.messages, message] }));
+  },
   clearMessages: () => set({ messages: [] }),
 
   isSending: false,

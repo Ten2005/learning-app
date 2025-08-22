@@ -15,8 +15,8 @@ import {
 } from "@/lib/db/file";
 import { revalidatePath } from "next/cache";
 import { chat } from "@/lib/ai/openai";
-import { UIMessage, Message } from "@/types/chat/message";
-
+import { UIMessage } from "@/store/chat";
+import { Message } from "@/store/chat";
 export async function createFolderAction(name: string) {
   try {
     const folder = await createFolder(name);

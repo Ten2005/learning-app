@@ -39,10 +39,16 @@ export function SearchSheet() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await setIsSending(true);
-    await addMessage({ id: crypto.randomUUID(), content: input, isUser: true });
+    const userMessage = {
+      id: crypto.randomUUID(),
+      content: input,
+      isUser: true,
+    };
+    await addMessage(userMessage);
     setInput("");
+    const updatedMessages = [...messages, userMessage];
     const response = await searchAction(
-      messages,
+      updatedMessages,
       isIncludeContext
         ? FILE_INCLUDE_SYSTEM_PROMPT_PREFIX + currentFile?.content
         : DEFAULT_SYSTEM_PROMPT,

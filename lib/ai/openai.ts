@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { Message } from "@/types/chat/message";
+import { Message } from "@/store/chat";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

@@ -10,6 +10,12 @@ interface ChatStore {
 
   isSending: boolean;
   setIsSending: (isSending: boolean) => void;
+
+  isConfirmingMemo: boolean;
+  setIsConfirmingMemo: (isConfirmingMemo: boolean) => void;
+
+  isAdding: boolean;
+  setIsAdding: (isAdding: boolean) => void;
 }
 
 interface Message {
@@ -29,4 +35,10 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   isSending: false,
   setIsSending: (isSending) => set({ isSending }),
+
+  isConfirmingMemo: false,
+  setIsConfirmingMemo: (isConfirmingMemo) => set({ isConfirmingMemo }),
+
+  isAdding: false,
+  setIsAdding: (isAdding) => set({ isAdding }),
 }));

@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 import EditTextAreaButton from "@/components/dashboard/editTextAreaButton";
-import { SearchSheet } from "@/components/dashboard/searchSheet";
+import { SearchSheet } from "@/components/chat/searchSheet";
 
 export default function Dashboard() {
   const { currentFile, setCurrentFile, isEditingTitle, isTextAreaDisabled } =

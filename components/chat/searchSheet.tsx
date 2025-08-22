@@ -12,9 +12,9 @@ import {
 import { TelescopeIcon, Loader2Icon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useChatStore } from "@/store/chat";
 import { searchAction } from "@/app/(main)/dashboard/actions";
+import { Message } from "./message";
 
 export function SearchSheet() {
   const { currentFile } = useDashboardStore();
@@ -94,18 +94,5 @@ export function SearchSheet() {
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  );
-}
-
-function Message({ content, isUser }: { content: string; isUser: boolean }) {
-  return (
-    <div
-      className={cn(
-        "flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm",
-        isUser ? "bg-primary text-primary-foreground ml-auto" : "bg-muted",
-      )}
-    >
-      {content}
-    </div>
   );
 }

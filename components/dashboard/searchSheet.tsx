@@ -49,7 +49,7 @@ export function SearchSheet() {
           <TelescopeIcon className="size-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-screen">
+      <SheetContent side="bottom" className="h-[100dvh] max-h-[100dvh]">
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
           <SheetDescription>Some description here.</SheetDescription>

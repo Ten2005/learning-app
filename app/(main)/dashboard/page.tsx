@@ -25,7 +25,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
       <div className="flex flex-col justify-between py-1 px-2">
         <div className="flex flex-row justify-between border-b pb-1">
           {currentFolder && <PageButtons />}

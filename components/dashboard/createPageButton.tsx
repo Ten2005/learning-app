@@ -27,6 +27,7 @@ export default function CreatePageButton() {
     <div>
       <Button
         size="sm"
+        variant="secondary"
         disabled={!currentFolder || !currentFile || isLoading}
         onClick={handleCreateFile}
       >

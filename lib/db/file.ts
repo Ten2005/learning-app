@@ -105,7 +105,10 @@ export async function incrementFilePages(parent_id: number, fromPage: number) {
   });
 }
 
-export async function renumberFilePages(parent_id: number, deletedPage: number) {
+export async function renumberFilePages(
+  parent_id: number,
+  deletedPage: number,
+) {
   const supabase = await createClient();
   const user = await getUser();
 
@@ -139,6 +142,6 @@ export async function renumberFilePages(parent_id: number, deletedPage: number) 
         console.error(`Failed to renumber file ${file.id}:`, error);
         throw new Error(`Failed to renumber file ${file.id}`);
       }
-    })
+    }),
   );
 }

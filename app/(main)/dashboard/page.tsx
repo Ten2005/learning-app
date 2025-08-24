@@ -13,40 +13,58 @@ import { SearchSheet } from "@/components/chat/searchSheet";
 import { useCallback } from "react";
 
 export default function Dashboard() {
-  const { currentFile, setCurrentFile, isEditingTitle, autoSaveTimeout, setAutoSaveTimeout } =
-    useDashboardStore();
-  const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
+  const {
+    currentFile,
+    setCurrentFile,
+    isEditingTitle,
+    autoSaveTimeout,
+    setAutoSaveTimeout,
+  } = useDashboardStore();
+  const { currentFolder, updateFileContent, updateFileTitle } =
+    useSidebarStore();
 
-  const autoSaveHandler = useCallback(async (fileId: number, title: string, content: string) => {
-    try {
-      await updateFileAction(fileId, title, content);
-      setCurrentFiles(
-        currentFiles.map((file) =>
-          file.id === fileId ? { ...file, content } : file
-        )
-      );
-    } catch (error) {
-      console.error("Auto-save failed:", error);
-    }
-    setAutoSaveTimeout(null);
-  }, [currentFiles, setCurrentFiles, setAutoSaveTimeout]);
-
-  const handleTextAreaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (currentFile) {
-      const updatedFile = { ...currentFile, content: e.target.value };
-      setCurrentFile(updatedFile);
-
-      if (autoSaveTimeout) {
-        clearTimeout(autoSaveTimeout);
+  const autoSaveHandler = useCallback(
+    async (fileId: number, title: string, content: string) => {
+      try {
+        await updateFileAction(fileId, title, content);
+        updateFileContent(fileId, content);
+      } catch (error) {
+        console.error("Auto-save failed:", error);
       }
+      setAutoSaveTimeout(null);
+    },
+    [updateFileContent, setAutoSaveTimeout],
+  );
 
-      const timeout = setTimeout(() => {
-        autoSaveHandler(updatedFile.id, updatedFile.title || "", updatedFile.content || "");
-      }, 500);
+  const handleTextAreaChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      if (currentFile) {
+        const updatedFile = { ...currentFile, content: e.target.value };
+        setCurrentFile(updatedFile);
 
-      setAutoSaveTimeout(timeout);
-    }
-  }, [currentFile, setCurrentFile, autoSaveTimeout, setAutoSaveTimeout, autoSaveHandler]);
+        if (autoSaveTimeout) {
+          clearTimeout(autoSaveTimeout);
+        }
+
+        const timeout = setTimeout(() => {
+          autoSaveHandler(
+            updatedFile.id,
+            updatedFile.title || "",
+            updatedFile.content || "",
+          );
+        }, 500);
+
+        setAutoSaveTimeout(timeout);
+      }
+    },
+    [
+      currentFile,
+      setCurrentFile,
+      autoSaveTimeout,
+      setAutoSaveTimeout,
+      autoSaveHandler,
+    ],
+  );
 
   return (
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
@@ -75,9 +93,9 @@ function EditTitle() {
   const { currentFile, setCurrentFile, setIsEditingTitle } =
     useDashboardStore();
 
-  const { currentFiles, setCurrentFiles } = useSidebarStore();
+  const { updateFileTitle } = useSidebarStore();
 
-  const handleUpdateTitle = async () => {
+  const handleUpdateTitle = useCallback(async () => {
     setIsEditingTitle(false);
     if (currentFile) {
       await updateFileAction(
@@ -85,15 +103,9 @@ function EditTitle() {
         currentFile.title || "",
         currentFile.content || "",
       );
-      setCurrentFiles(
-        currentFiles.map((file) =>
-          file.id === currentFile.id
-            ? { ...file, title: currentFile.title }
-            : file,
-        ),
-      );
+      updateFileTitle(currentFile.id, currentFile.title || "");
     }
-  };
+  }, [currentFile, setIsEditingTitle, updateFileTitle]);
 
   return (
     <div className="flex flex-row items-center gap-1">

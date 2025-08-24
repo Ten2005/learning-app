@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { shallow } from "zustand/shallow";
 
 export interface UsedFolder {
   id: number;
@@ -24,6 +25,8 @@ interface SidebarState {
 
   currentFiles: UsedFile[];
   setCurrentFiles: (currentFiles: UsedFile[]) => void;
+  updateFileContent: (fileId: number, content: string) => void;
+  updateFileTitle: (fileId: number, title: string) => void;
 
   insertFileAfterCurrent: (newFile: UsedFile, currentPage: number) => void;
 
@@ -38,9 +41,11 @@ interface SidebarState {
 
   isDeleting: boolean;
   setIsDeleting: (isDeletingFile: boolean) => void;
+
+  getFilesByFolder: (folderId: number) => UsedFile[];
 }
 
-export const useSidebarStore = create<SidebarState>((set) => ({
+export const useSidebarStore = create<SidebarState>((set, get) => ({
   newFolderName: "",
   setNewFolderName: (newFolderName) => set({ newFolderName }),
 
@@ -52,6 +57,20 @@ export const useSidebarStore = create<SidebarState>((set) => ({
 
   currentFiles: [],
   setCurrentFiles: (currentFiles) => set({ currentFiles }),
+
+  updateFileContent: (fileId: number, content: string) =>
+    set((state) => ({
+      currentFiles: state.currentFiles.map((file) =>
+        file.id === fileId ? { ...file, content } : file,
+      ),
+    })),
+
+  updateFileTitle: (fileId: number, title: string) =>
+    set((state) => ({
+      currentFiles: state.currentFiles.map((file) =>
+        file.id === fileId ? { ...file, title } : file,
+      ),
+    })),
 
   insertFileAfterCurrent: (newFile, currentPage) =>
     set((state) => {
@@ -77,4 +96,9 @@ export const useSidebarStore = create<SidebarState>((set) => ({
 
   isDeleting: false,
   setIsDeleting: (isDeleting) => set({ isDeleting }),
+
+  getFilesByFolder: (folderId: number) => {
+    const { currentFiles, currentFolder } = get();
+    return currentFolder?.id === folderId ? currentFiles : [];
+  },
 }));

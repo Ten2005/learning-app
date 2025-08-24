@@ -13,8 +13,11 @@ interface DashboardState {
 
   autoSaveTimeout: NodeJS.Timeout | null;
   setAutoSaveTimeout: (timeout: NodeJS.Timeout | null) => void;
-  
-  getAutoSaveState: () => { currentFile: UsedFile | undefined; autoSaveTimeout: NodeJS.Timeout | null };
+
+  getAutoSaveState: () => {
+    currentFile: UsedFile | undefined;
+    autoSaveTimeout: NodeJS.Timeout | null;
+  };
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({

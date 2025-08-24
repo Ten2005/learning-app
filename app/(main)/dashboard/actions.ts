@@ -14,11 +14,12 @@ import {
   incrementFilePages,
   renumberFilePages,
 } from "@/lib/db/file";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 export async function createFolderAction(name: string) {
   try {
     const folder = await createFolder(name);
     revalidatePath("/dashboard");
+    revalidateTag("folders");
     return folder;
   } catch (error) {
     console.error("Error creating folder:", error);
@@ -40,6 +41,7 @@ export async function updateFolderAction(id: number, name: string) {
   try {
     const folder = await updateFolder(id, name);
     revalidatePath("/dashboard");
+    revalidateTag("folders");
     return folder;
   } catch (error) {
     console.error("Error updating folder:", error);
@@ -51,6 +53,8 @@ export async function deleteFolderAction(id: number) {
   try {
     const folder = await deleteFolder(id);
     revalidatePath("/dashboard");
+    revalidateTag("folders");
+    revalidateTag("files");
     return folder;
   } catch (error) {
     console.error("Error deleting folder:", error);
@@ -62,6 +66,7 @@ export async function createFileAction(parent_id: number, page: number) {
   try {
     const file = await createFile(parent_id, page);
     revalidatePath("/dashboard");
+    revalidateTag("files");
     return file;
   } catch (error) {
     console.error("Error creating file:", error);
@@ -78,6 +83,7 @@ export async function createFileAfterCurrentAction(
 
     const file = await createFile(parent_id, currentPage + 1);
     revalidatePath("/dashboard");
+    revalidateTag("files");
     return file;
   } catch (error) {
     console.error("Error in createFileAfterCurrentAction:", error);
@@ -103,6 +109,7 @@ export async function updateFileAction(
   try {
     const file = await updateFile(id, title, content);
     revalidatePath("/dashboard");
+    revalidateTag("files");
     return file;
   } catch (error) {
     console.error("Error updating file:", error);
@@ -110,11 +117,16 @@ export async function updateFileAction(
   }
 }
 
-export async function deleteFileAction(id: number, parent_id: number, page: number) {
+export async function deleteFileAction(
+  id: number,
+  parent_id: number,
+  page: number,
+) {
   try {
     const file = await deleteFile(id);
     await renumberFilePages(parent_id, page);
     revalidatePath("/dashboard");
+    revalidateTag("files");
     return file;
   } catch (error) {
     console.error("Error deleting file:", error);

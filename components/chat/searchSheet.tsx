@@ -11,7 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { TelescopeIcon, Loader2Icon } from "lucide-react";
+import { TelescopeIcon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";

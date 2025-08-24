@@ -20,8 +20,7 @@ export default function Dashboard() {
     autoSaveTimeout,
     setAutoSaveTimeout,
   } = useDashboardStore();
-  const { currentFolder, updateFileContent, updateFileTitle } =
-    useSidebarStore();
+  const { currentFolder, updateFileContent } = useSidebarStore();
 
   const autoSaveHandler = useCallback(
     async (fileId: number, title: string, content: string) => {

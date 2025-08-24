@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from "@/constants/index";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -9,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NeoTome",
-  description: "NeoTome is a platform for creating books",
+  title: PRODUCT_NAME,
+  description: PRODUCT_DESCRIPTION,
 };
 
 export default function RootLayout({

@@ -31,7 +31,7 @@ export function SearchSheet() {
           <TelescopeIcon className="size-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[100dvh] max-h-[100dvh]">
+      <SheetContent side="bottom" className="h-[100dvh] max-h-[100dvh] gap-0">
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
           <SheetDescription>Some description here.</SheetDescription>

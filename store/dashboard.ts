@@ -8,11 +8,11 @@ interface DashboardState {
   isEditingTitle: boolean;
   setIsEditingTitle: (isEditingTitle: boolean) => void;
 
-  isTextAreaDisabled: boolean;
-  setIsTextAreaDisabled: (isTextAreaDisabled: boolean) => void;
-
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
+
+  autoSaveTimeout: NodeJS.Timeout | null;
+  setAutoSaveTimeout: (timeout: NodeJS.Timeout | null) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -22,9 +22,9 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   isEditingTitle: false,
   setIsEditingTitle: (isEditingTitle) => set({ isEditingTitle }),
 
-  isTextAreaDisabled: true,
-  setIsTextAreaDisabled: (isTextAreaDisabled) => set({ isTextAreaDisabled }),
-
   isLoading: false,
   setIsLoading: (isLoading) => set({ isLoading }),
+
+  autoSaveTimeout: null,
+  setAutoSaveTimeout: (timeout) => set({ autoSaveTimeout: timeout }),
 }));

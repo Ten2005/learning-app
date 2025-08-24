@@ -9,17 +9,37 @@ import PageButtons from "@/components/dashboard/pageButton";
 import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
-import EditTextAreaButton from "@/components/dashboard/editTextAreaButton";
 import { SearchSheet } from "@/components/chat/searchSheet";
 
 export default function Dashboard() {
-  const { currentFile, setCurrentFile, isEditingTitle, isTextAreaDisabled } =
+  const { currentFile, setCurrentFile, isEditingTitle, autoSaveTimeout, setAutoSaveTimeout } =
     useDashboardStore();
-  const { currentFolder } = useSidebarStore();
+  const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (currentFile) {
-      setCurrentFile({ ...currentFile, content: e.target.value });
+      const updatedFile = { ...currentFile, content: e.target.value };
+      setCurrentFile(updatedFile);
+
+      if (autoSaveTimeout) {
+        clearTimeout(autoSaveTimeout);
+      }
+
+      const timeout = setTimeout(async () => {
+        try {
+          await updateFileAction(updatedFile.id, updatedFile.title || "", updatedFile.content || "");
+          setCurrentFiles(
+            currentFiles.map((file) =>
+              file.id === updatedFile.id ? { ...file, content: updatedFile.content } : file
+            )
+          );
+        } catch (error) {
+          console.error("Auto-save failed:", error);
+        }
+        setAutoSaveTimeout(null);
+      }, 1000);
+
+      setAutoSaveTimeout(timeout);
     }
   };
 
@@ -32,13 +52,12 @@ export default function Dashboard() {
         </div>
         <div className="flex flex-row justify-between items-center border-b py-1">
           <SearchSheet />
-          <EditTextAreaButton />
         </div>
       </div>
       <Textarea
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}
-        disabled={isTextAreaDisabled || !currentFile}
+        disabled={!currentFile}
         className="
         w-full flex-1
         resize-none border-none focus:border-none focus-visible:ring-0"

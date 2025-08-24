@@ -32,16 +32,30 @@ export default function CurrentFolder() {
   const { setCurrentFile } = useDashboardStore();
 
   const handleDeleteFile = async (fileId: number) => {
-    await setIsDeleting(true);
-    await deleteFileAction(fileId);
-    const filteredFiles = currentFiles.filter((file) => file.id !== fileId);
-    await setCurrentFiles(filteredFiles);
+    if (!currentFolder) return;
+    
+    const fileToDelete = currentFiles.find((file) => file.id === fileId);
+    if (!fileToDelete) return;
+
+    setIsDeleting(true);
+    await deleteFileAction(fileId, currentFolder.id, fileToDelete.page);
+    
+    const filteredFiles = currentFiles
+      .filter((file) => file.id !== fileId)
+      .map((file) => ({
+        ...file,
+        page: file.page > fileToDelete.page ? file.page - 1 : file.page
+      }))
+      .sort((a, b) => a.page - b.page);
+    
+    setCurrentFiles(filteredFiles);
+    
     if (filteredFiles.length === 0 && currentFolder) {
       const file = await createFileAction(currentFolder.id, 0);
       setCurrentFiles([file]);
       setCurrentFile(file);
     }
-    await setIsDeleting(false);
+    setIsDeleting(false);
   };
 
   if (!currentFolder)

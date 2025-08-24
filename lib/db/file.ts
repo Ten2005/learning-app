@@ -104,3 +104,41 @@ export async function incrementFilePages(parent_id: number, fromPage: number) {
     return data;
   });
 }
+
+export async function renumberFilePages(parent_id: number, deletedPage: number) {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  const { data: targetFiles, error: fetchError } = await supabase
+    .from("file")
+    .select("id, page")
+    .eq("user_id", user.id)
+    .eq("parent_id", parent_id)
+    .eq("is_deleted", false)
+    .gt("page", deletedPage)
+    .order("page", { ascending: true });
+
+  if (fetchError) {
+    console.error("Fetch error:", fetchError);
+    throw new Error("Failed to fetch files for renumbering");
+  }
+
+  if (!targetFiles || targetFiles.length === 0) {
+    return [];
+  }
+
+  await Promise.all(
+    targetFiles.map(async (file) => {
+      const { error } = await supabase
+        .from("file")
+        .update({ page: file.page - 1 })
+        .eq("id", file.id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error(`Failed to renumber file ${file.id}:`, error);
+        throw new Error(`Failed to renumber file ${file.id}`);
+      }
+    })
+  );
+}

@@ -12,6 +12,7 @@ import {
   readFiles,
   updateFile,
   incrementFilePages,
+  renumberFilePages,
 } from "@/lib/db/file";
 import { revalidatePath } from "next/cache";
 export async function createFolderAction(name: string) {
@@ -109,9 +110,10 @@ export async function updateFileAction(
   }
 }
 
-export async function deleteFileAction(id: number) {
+export async function deleteFileAction(id: number, parent_id: number, page: number) {
   try {
     const file = await deleteFile(id);
+    await renumberFilePages(parent_id, page);
     revalidatePath("/dashboard");
     return file;
   } catch (error) {

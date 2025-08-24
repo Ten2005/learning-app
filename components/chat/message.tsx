@@ -1,33 +1,15 @@
+"use client";
+
 import { cn } from "@/lib/utils";
-import AddConfirmationDialog from "./addConfirmationDialog";
-import { useDashboardStore } from "@/store/dashboard";
-import { UsedFile } from "@/store/sidebar";
-import { updateFileAction } from "@/app/(main)/dashboard/actions";
+import { UIMessage } from "ai";
 
 export function Message({
-  content,
+  parts,
   isUser,
 }: {
-  content: string;
+  parts: UIMessage["parts"];
   isUser: boolean;
 }) {
-  const { currentFile, setCurrentFile } = useDashboardStore();
-
-  const handleAddMessage = async () => {
-    if (currentFile) {
-      const updatedFile: UsedFile = {
-        ...currentFile,
-        content: currentFile.content + "\n\n" + content,
-      };
-      await updateFileAction(
-        currentFile.id,
-        updatedFile.title,
-        updatedFile.content,
-      );
-      setCurrentFile(updatedFile);
-    }
-  };
-
   return (
     <div className="flex flex-row gap-2 items-end">
       <div
@@ -36,10 +18,12 @@ export function Message({
           isUser ? "bg-primary text-primary-foreground ml-auto" : "bg-muted",
         )}
       >
-        {content}
-      </div>
-      <div className="flex flex-row justify-end">
-        <AddConfirmationDialog addFunction={handleAddMessage} />
+        {parts.map((part: UIMessage["parts"][number], i: number) => {
+          switch (part.type) {
+            case "text":
+              return <div key={`${i}`}>{part.text}</div>;
+          }
+        })}
       </div>
     </div>
   );

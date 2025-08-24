@@ -10,13 +10,28 @@ import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 import { SearchSheet } from "@/components/chat/searchSheet";
+import { useCallback } from "react";
 
 export default function Dashboard() {
   const { currentFile, setCurrentFile, isEditingTitle, autoSaveTimeout, setAutoSaveTimeout } =
     useDashboardStore();
   const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
 
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const autoSaveHandler = useCallback(async (fileId: number, title: string, content: string) => {
+    try {
+      await updateFileAction(fileId, title, content);
+      setCurrentFiles(
+        currentFiles.map((file) =>
+          file.id === fileId ? { ...file, content } : file
+        )
+      );
+    } catch (error) {
+      console.error("Auto-save failed:", error);
+    }
+    setAutoSaveTimeout(null);
+  }, [currentFiles, setCurrentFiles, setAutoSaveTimeout]);
+
+  const handleTextAreaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (currentFile) {
       const updatedFile = { ...currentFile, content: e.target.value };
       setCurrentFile(updatedFile);
@@ -25,23 +40,13 @@ export default function Dashboard() {
         clearTimeout(autoSaveTimeout);
       }
 
-      const timeout = setTimeout(async () => {
-        try {
-          await updateFileAction(updatedFile.id, updatedFile.title || "", updatedFile.content || "");
-          setCurrentFiles(
-            currentFiles.map((file) =>
-              file.id === updatedFile.id ? { ...file, content: updatedFile.content } : file
-            )
-          );
-        } catch (error) {
-          console.error("Auto-save failed:", error);
-        }
-        setAutoSaveTimeout(null);
-      }, 1000);
+      const timeout = setTimeout(() => {
+        autoSaveHandler(updatedFile.id, updatedFile.title || "", updatedFile.content || "");
+      }, 500);
 
       setAutoSaveTimeout(timeout);
     }
-  };
+  }, [currentFile, setCurrentFile, autoSaveTimeout, setAutoSaveTimeout, autoSaveHandler]);
 
   return (
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">

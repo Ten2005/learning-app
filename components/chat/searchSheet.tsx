@@ -68,7 +68,7 @@ export function SearchSheet() {
             </div>
           </div>
         </SheetHeader>
-        <div className="flex flex-col gap-4 p-4 overflow-y-auto">
+        <div className="flex flex-col gap-4 px-4 overflow-y-auto h-full">
           {messages.map((message) => (
             <Message
               key={message.id}

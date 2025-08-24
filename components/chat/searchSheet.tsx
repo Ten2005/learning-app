@@ -1,8 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import {
   Sheet,
@@ -22,16 +20,9 @@ import { useChat } from "@ai-sdk/react";
 
 export function SearchSheet() {
   const { currentFile } = useDashboardStore();
-  const {
-    input,
-    setInput,
-    isSending,
-    clearMessages,
-    isIncludeContext,
-    setIsIncludeContext,
-  } = useChatStore();
+  const { input, setInput } = useChatStore();
 
-  const { messages, sendMessage } = useChat();
+  const { messages, setMessages, sendMessage } = useChat();
 
   return (
     <Sheet>
@@ -48,12 +39,12 @@ export function SearchSheet() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => clearMessages()}
+              onClick={() => setMessages([])}
               disabled={messages.length === 0}
             >
               Clear Chat
             </Button>
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <Switch
                 id="include-context"
                 checked={isIncludeContext}
@@ -65,7 +56,7 @@ export function SearchSheet() {
               >
                 Include current file as context
               </Label>
-            </div>
+            </div> */}
           </div>
         </SheetHeader>
         <div className="flex flex-col gap-4 px-4 overflow-y-auto h-full">
@@ -86,17 +77,9 @@ export function SearchSheet() {
             }}
             className="flex w-full items-center gap-2"
           >
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              disabled={isSending}
-            />
-            <Button type="submit" size="icon" disabled={isSending || !input}>
-              {isSending ? (
-                <Loader2Icon className="size-4 animate-spin" />
-              ) : (
-                <SearchIcon className="size-4" />
-              )}
+            <Input value={input} onChange={(e) => setInput(e.target.value)} />
+            <Button type="submit" size="icon" disabled={!input}>
+              <SearchIcon className="size-4" />
             </Button>
           </form>
         </SheetFooter>

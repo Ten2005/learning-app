@@ -40,7 +40,6 @@ export function SearchSheet() {
               variant="secondary"
               size="sm"
               onClick={() => setMessages([])}
-              disabled={messages.length === 0}
             >
               Clear Chat
             </Button>

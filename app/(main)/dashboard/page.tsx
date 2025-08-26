@@ -72,7 +72,7 @@ export default function Dashboard() {
           {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
           {currentFolder && <PageButtons />}
         </div>
-        <div className="flex flex-row justify-between items-center border-b py-1">
+        <div className="flex flex-row justify-end items-center border-b py-1">
           <SearchSheet />
         </div>
       </div>

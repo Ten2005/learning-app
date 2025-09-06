@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebar";
 import { createFolderAction } from "@/app/(main)/dashboard/actions";
 
@@ -38,7 +38,7 @@ export default function NewFolderDialog() {
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <Button size="sm">
-          <Plus className="w-4 h-4 mr-2" />
+          <PlusIcon />
           New Folder
         </Button>
       </DialogTrigger>

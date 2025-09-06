@@ -29,7 +29,6 @@ export default function CreatePageButton() {
       variant="outline"
       disabled={!currentFolder || !currentFile || isLoading}
       onClick={handleCreateFile}
-      className="w-full"
     >
       <PlusIcon />
       New Page

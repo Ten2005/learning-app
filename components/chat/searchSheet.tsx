@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 import { TelescopeIcon } from "lucide-react";
 import { Loader2Icon } from "lucide-react";
-import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "./message";
@@ -30,7 +29,6 @@ import { models } from "@/store/chat";
 import { useMemo } from "react";
 
 export function SearchSheet() {
-  const { currentFile } = useDashboardStore();
   const {
     input,
     setInput,
@@ -52,7 +50,7 @@ export function SearchSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" disabled={!currentFile}>
+        <Button variant="outline" size="icon">
           <TelescopeIcon className="size-4" />
         </Button>
       </SheetTrigger>

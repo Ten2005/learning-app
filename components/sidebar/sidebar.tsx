@@ -23,7 +23,9 @@ export async function DashboardSidebar() {
         <Folders folders={folders} />
         <SidebarGroup>
           <SidebarGroupContent>
-            <NewFolderDialog />
+            <div className="flex justify-end">
+              <NewFolderDialog />
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

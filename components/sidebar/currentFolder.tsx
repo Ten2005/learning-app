@@ -128,7 +128,9 @@ export default function CurrentFolder() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <CreatePageButton />
+        <div className="flex justify-end">
+          <CreatePageButton />
+        </div>
       </SidebarGroupContent>
     </SidebarGroup>
   );

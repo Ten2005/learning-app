@@ -15,8 +15,10 @@ import { useSidebarStore } from "@/store/sidebar";
 
 export default function DeleteConfirmationDialog({
   deleteFunction,
+  target,
 }: {
   deleteFunction: () => void;
+  target: string;
 }) {
   const { isDeleting } = useSidebarStore();
   return (
@@ -28,7 +30,9 @@ export default function DeleteConfirmationDialog({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete</AlertDialogTitle>
+          <AlertDialogTitle>
+            Delete <span className="text-primary">{target}</span>
+          </AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone.
           </AlertDialogDescription>

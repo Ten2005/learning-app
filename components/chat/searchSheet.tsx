@@ -11,18 +11,35 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TelescopeIcon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "./message";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { models } from "@/store/chat";
+import { useMemo } from "react";
 
 export function SearchSheet() {
   const { currentFile } = useDashboardStore();
-  const { input, setInput } = useChatStore();
-
-  const { messages, setMessages, sendMessage } = useChat();
+  const { input, setInput, selectedModel, setSelectedModel } = useChatStore();
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: { model: selectedModel },
+      }),
+    [selectedModel],
+  );
+  const { messages, setMessages, sendMessage } = useChat({ transport });
 
   return (
     <Sheet>
@@ -31,7 +48,11 @@ export function SearchSheet() {
           <TelescopeIcon className="size-4" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[100dvh] max-h-[100dvh] gap-0">
+      <SheetContent
+        side="bottom"
+        className="h-[100dvh] max-h-[100dvh] gap-0"
+        isArrow
+      >
         <SheetHeader>
           <SheetTitle>Query Space</SheetTitle>
           <SheetDescription>Some description here.</SheetDescription>
@@ -43,19 +64,18 @@ export function SearchSheet() {
             >
               Clear Chat
             </Button>
-            {/* <div className="flex items-center space-x-2">
-              <Switch
-                id="include-context"
-                checked={isIncludeContext}
-                onCheckedChange={setIsIncludeContext}
-              />
-              <Label
-                htmlFor="include-context"
-                className={isIncludeContext ? "text-primary" : ""}
-              >
-                Include current file as context
-              </Label>
-            </div> */}
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Model" />
+              </SelectTrigger>
+              <SelectContent>
+                {models.map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </SheetHeader>
         <div className="flex flex-col gap-4 px-4 overflow-y-auto h-full">

@@ -74,7 +74,7 @@ export default function CurrentFolder() {
       <SidebarGroupLabel>Current Folder</SidebarGroupLabel>
       <SidebarGroupContent>
         <EditFolder currentFolder={currentFolder} />
-        <Accordion type="single" collapsible>
+        <Accordion type="single" defaultValue="item-1" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger>
               <div className="flex items-center justify-start w-full">
@@ -101,6 +101,7 @@ export default function CurrentFolder() {
                   </Button>
                   <DeleteConfirmationDialog
                     deleteFunction={() => handleDeleteFile(file.id)}
+                    target={file.title || "None"}
                   />
                 </div>
               ))}
@@ -152,7 +153,10 @@ function EditFolder({ currentFolder }: { currentFolder: UsedFolder }) {
             <PencilIcon className="w-4 h-4" />
           )}
         </Button>
-        <DeleteConfirmationDialog deleteFunction={handleDeleteFolder} />
+        <DeleteConfirmationDialog
+          deleteFunction={handleDeleteFolder}
+          target={currentFolder.name}
+        />
       </div>
     </div>
   );

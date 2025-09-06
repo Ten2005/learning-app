@@ -27,8 +27,13 @@ import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 import CreatePageButton from "./createPageButton";
 
 export default function CurrentFolder() {
-  const { currentFolder, currentFiles, setCurrentFiles, setIsDeleting } =
-    useSidebarStore();
+  const {
+    currentFolder,
+    currentFiles,
+    setCurrentFiles,
+    setIsDeleting,
+    setFilesForFolder,
+  } = useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
 
   const handleDeleteFile = async (fileId: number) => {
@@ -49,10 +54,14 @@ export default function CurrentFolder() {
       .sort((a, b) => a.page - b.page);
 
     setCurrentFiles(filteredFiles);
+    if (currentFolder) {
+      setFilesForFolder(currentFolder.id, filteredFiles);
+    }
 
     if (filteredFiles.length === 0 && currentFolder) {
       const file = await createFileAction(currentFolder.id, 0);
       setCurrentFiles([file]);
+      setFilesForFolder(currentFolder.id, [file]);
       setCurrentFile(file);
     }
     setIsDeleting(false);
@@ -84,26 +93,37 @@ export default function CurrentFolder() {
             </AccordionTrigger>
             <AccordionContent>
               {currentFiles.map((file) => (
-                <div
-                  className="flex items-center justify-between w-full"
+                <Button
                   key={file.id}
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground p-0 justify-between w-full"
+                  onClick={() => {
+                    setCurrentFile(file);
+                  }}
+                  asChild
                 >
-                  <Button
-                    key={file.id}
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground"
-                    onClick={() => {
-                      setCurrentFile(file);
-                    }}
-                  >
-                    {file.page} : {file.title || "None"}
-                  </Button>
-                  <DeleteConfirmationDialog
-                    deleteFunction={() => handleDeleteFile(file.id)}
-                    target={file.title || "None"}
-                  />
-                </div>
+                  <div>
+                    <span>
+                      {file.page} :{" "}
+                      {file.title
+                        ? file.title.length > 7
+                          ? file.title.slice(0, 7) + "..."
+                          : file.title
+                        : "None"}
+                    </span>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <DeleteConfirmationDialog
+                        deleteFunction={() => handleDeleteFile(file.id)}
+                        target={file.title || "None"}
+                      />
+                    </span>
+                  </div>
+                </Button>
               ))}
             </AccordionContent>
           </AccordionItem>

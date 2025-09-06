@@ -2,6 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { UIMessage } from "ai";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import { markdownComponents } from "@/components/chat/markdownComponents";
 
 export function Message({
   parts,
@@ -20,8 +24,23 @@ export function Message({
       >
         {parts.map((part: UIMessage["parts"][number], i: number) => {
           switch (part.type) {
-            case "text":
-              return <div key={`${i}`}>{part.text}</div>;
+            case "text": {
+              if (isUser) {
+                return <div key={`${i}`}>{part.text}</div>;
+              }
+              return (
+                <ReactMarkdown
+                  key={`${i}`}
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
+                  components={markdownComponents}
+                >
+                  {part.text}
+                </ReactMarkdown>
+              );
+            }
+            default:
+              return null;
           }
         })}
       </div>

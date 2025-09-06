@@ -7,7 +7,9 @@ export default function Home() {
     <div className="flex items-center justify-center h-[100dvh] gap-4 p-4">
       <h1 className="text-4xl font-bold">{PRODUCT_NAME}</h1>
       <Button size="sm" asChild>
-        <Link href="/dashboard">Get Started</Link>
+        <Link href="/dashboard" prefetch>
+          Get Started
+        </Link>
       </Button>
     </div>
   );

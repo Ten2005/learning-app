@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TelescopeIcon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
@@ -30,7 +31,14 @@ import { useMemo } from "react";
 
 export function SearchSheet() {
   const { currentFile } = useDashboardStore();
-  const { input, setInput, selectedModel, setSelectedModel } = useChatStore();
+  const {
+    input,
+    setInput,
+    selectedModel,
+    setSelectedModel,
+    isSending,
+    setIsSending,
+  } = useChatStore();
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -89,16 +97,36 @@ export function SearchSheet() {
         </div>
         <SheetFooter>
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              sendMessage({ text: input });
-              setInput("");
+              if (!input || isSending) return;
+              try {
+                setIsSending(true);
+                const sendInput = await input;
+                setInput("");
+                await sendMessage({ text: sendInput });
+              } finally {
+                setIsSending(false);
+              }
             }}
             className="flex w-full items-center gap-2"
           >
-            <Input value={input} onChange={(e) => setInput(e.target.value)} />
-            <Button type="submit" size="icon" disabled={!input}>
-              <SearchIcon className="size-4" />
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isSending}
+            />
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!input || isSending}
+              aria-busy={isSending}
+            >
+              {isSending ? (
+                <Loader2Icon className="size-4 animate-spin" />
+              ) : (
+                <SearchIcon className="size-4" />
+              )}
             </Button>
           </form>
         </SheetFooter>

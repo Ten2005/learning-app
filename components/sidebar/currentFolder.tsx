@@ -29,7 +29,7 @@ import CreatePageButton from "./createPageButton";
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles, setIsDeleting } =
     useSidebarStore();
-  const { setCurrentFile } = useDashboardStore();
+  const { currentFile, setCurrentFile } = useDashboardStore();
 
   const handleDeleteFile = async (fileId: number) => {
     if (!currentFolder) return;
@@ -54,6 +54,12 @@ export default function CurrentFolder() {
       const file = await createFileAction(currentFolder.id, 0);
       setCurrentFiles([file]);
       setCurrentFile(file);
+    } else {
+      const updatedCurrent =
+        currentFile?.id === fileId
+          ? filteredFiles[0]
+          : filteredFiles.find((file) => file.id === currentFile?.id);
+      if (updatedCurrent) setCurrentFile(updatedCurrent);
     }
     setIsDeleting(false);
   };

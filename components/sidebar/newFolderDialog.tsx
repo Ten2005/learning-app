@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { PlusIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebar";
 import { createFolderAction } from "@/app/(main)/dashboard/actions";
 
@@ -37,8 +37,12 @@ export default function NewFolderDialog() {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button size="sm">
-          <PlusIcon />
+        <Button size="sm" disabled={isCreatingFolder}>
+          {isCreatingFolder ? (
+            <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <PlusIcon />
+          )}
           New Folder
         </Button>
       </DialogTrigger>
@@ -62,6 +66,9 @@ export default function NewFolderDialog() {
             disabled={newFolderName === "" || !isDialogOpen || isCreatingFolder}
             onClick={handleCreateFolder}
           >
+            {isCreatingFolder ? (
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
             Create
           </Button>
         </DialogFooter>

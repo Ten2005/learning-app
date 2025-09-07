@@ -2,7 +2,7 @@
 
 import { useSidebarStore } from "@/store/sidebar";
 import { Button } from "../ui/button";
-import { PlusIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { createFileAfterCurrentAction } from "@/app/(main)/dashboard/actions";
 import { useDashboardStore } from "@/store/dashboard";
 
@@ -30,7 +30,11 @@ export default function CreatePageButton() {
       disabled={!currentFolder || !currentFile || isLoading}
       onClick={handleCreateFile}
     >
-      <PlusIcon />
+      {isLoading ? (
+        <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <PlusIcon />
+      )}
       New Page
     </Button>
   );

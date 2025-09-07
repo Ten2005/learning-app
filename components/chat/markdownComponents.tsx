@@ -1,65 +1,55 @@
 import { type Components } from "react-markdown";
-import { cn } from "@/lib/utils";
 
 export const markdownComponents: Components = {
-  code: ({ className, children, ...props }) => (
-    <code
-      className={cn(
-        "rounded bg-background px-1 py-[2px] font-mono text-xs",
-        className,
-      )}
-      {...props}
-    >
+  h1: ({ children }) => (
+    <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+      {children}
+    </h1>
+  ),
+  h2: ({ children }) => (
+    <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+      {children}
+    </h2>
+  ),
+  h3: ({ children }) => (
+    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+      {children}
+    </h3>
+  ),
+  h4: ({ children }) => (
+    <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+      {children}
+    </h4>
+  ),
+  p: ({ children }) => (
+    <p className="leading-7 [&:not(:first-child)]:mt-6">{children}</p>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="mt-6 border-l-2 pl-6 italic">{children}</blockquote>
+  ),
+  tr: ({ children }) => (
+    <tr className="even:bg-muted m-0 border-t p-0">{children}</tr>
+  ),
+  th: ({ children }) => (
+    <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
+      {children}
+    </td>
+  ),
+  ul: ({ children }) => (
+    <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>
+  ),
+  li: ({ children }) => <li>{children}</li>,
+  code: ({ children }) => (
+    <code className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
       {children}
     </code>
   ),
-  pre: ({ children, ...props }) => (
-    <pre
-      className={cn(
-        "w-full overflow-x-auto rounded-md border bg-background p-3 text-xs leading-relaxed",
-      )}
-      {...props}
-    >
-      {children}
-    </pre>
+  small: ({ children }) => (
+    <small className="text-sm leading-none font-medium">{children}</small>
   ),
-  p: ({ children }) => (
-    <p className="leading-7 [&:not(:first-child)]:mt-2">{children}</p>
-  ),
-  a: ({ children, href }) => (
-    <a href={href} className="underline underline-offset-4 text-primary">
-      {children}
-    </a>
-  ),
-  ul: ({ children }) => (
-    <ul className="list-disc pl-6 space-y-1">{children}</ul>
-  ),
-  ol: ({ children }) => (
-    <ol className="list-decimal pl-6 space-y-1">{children}</ol>
-  ),
-  li: ({ children }) => <li className="leading-7">{children}</li>,
-  blockquote: ({ children }) => (
-    <blockquote className="border-l-2 pl-4 italic text-muted-foreground">
-      {children}
-    </blockquote>
-  ),
-  hr: () => <hr className="my-4 border-muted-foreground/30" />,
-  h1: ({ children }) => (
-    <h1 className="text-xl font-semibold mt-3">{children}</h1>
-  ),
-  h2: ({ children }) => (
-    <h2 className="text-lg font-semibold mt-3">{children}</h2>
-  ),
-  h3: ({ children }) => (
-    <h3 className="text-base font-semibold mt-3">{children}</h3>
-  ),
-  table: ({ children }) => (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full text-left border-collapse">{children}</table>
-    </div>
-  ),
-  th: ({ children }) => (
-    <th className="border-b px-2 py-1 font-medium">{children}</th>
-  ),
-  td: ({ children }) => <td className="border-b px-2 py-1">{children}</td>,
 };

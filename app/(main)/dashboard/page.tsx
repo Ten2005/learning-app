@@ -12,58 +12,44 @@ import { updateFileAction } from "./actions";
 import { SearchSheet } from "@/components/chat/searchSheet";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { useAutoSave } from "@/hooks/use-auto-save";
 
 export default function Dashboard() {
-  const {
-    currentFile,
-    setCurrentFile,
-    isEditingTitle,
-    autoSaveTimeout,
-    setAutoSaveTimeout,
-  } = useDashboardStore();
+  const { currentFile, setCurrentFile, isEditingTitle } = useDashboardStore();
   const { currentFolder, updateFileContent } = useSidebarStore();
 
-  const autoSaveHandler = useCallback(
-    async (fileId: number, title: string, content: string) => {
+  const saveFile = useCallback(
+    async (signal: AbortSignal) => {
+      if (!currentFile) return;
       try {
-        await updateFileAction(fileId, title, content);
-        updateFileContent(fileId, content);
+        await fetch(`/api/file/${currentFile.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: currentFile.title || "",
+            content: currentFile.content || "",
+          }),
+          signal,
+        });
+        updateFileContent(currentFile.id, currentFile.content || "");
       } catch (error) {
-        console.error("Auto-save failed:", error);
+        if ((error as Error).name !== "AbortError") {
+          console.error("Auto-save failed:", error);
+        }
       }
-      setAutoSaveTimeout(null);
     },
-    [updateFileContent, setAutoSaveTimeout],
+    [currentFile, updateFileContent],
   );
+
+  useAutoSave(currentFile, 500, saveFile);
 
   const handleTextAreaChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (currentFile) {
-        const updatedFile = { ...currentFile, content: e.target.value };
-        setCurrentFile(updatedFile);
-
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-        }
-
-        const timeout = setTimeout(() => {
-          autoSaveHandler(
-            updatedFile.id,
-            updatedFile.title || "",
-            updatedFile.content || "",
-          );
-        }, 500);
-
-        setAutoSaveTimeout(timeout);
+        setCurrentFile({ ...currentFile, content: e.target.value });
       }
     },
-    [
-      currentFile,
-      setCurrentFile,
-      autoSaveTimeout,
-      setAutoSaveTimeout,
-      autoSaveHandler,
-    ],
+    [currentFile, setCurrentFile],
   );
 
   return (

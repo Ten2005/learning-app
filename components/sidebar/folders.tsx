@@ -1,6 +1,6 @@
 "use client";
 
-import { UsedFolder } from "@/store/sidebar";
+import { UsedFolder, UsedFile } from "@/store/sidebar";
 import { Button } from "../ui/button";
 import { Folder } from "lucide-react";
 import {
@@ -10,28 +10,39 @@ import {
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
-import { readFilesAction } from "@/app/(main)/dashboard/actions";
 import { createFileAction } from "@/app/(main)/dashboard/actions";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
-export default function Folders({ folders }: { folders: UsedFolder[] }) {
-  const { setCurrentFolder, setCurrentFiles, getFilesByFolder } =
+type FolderWithFiles = UsedFolder & { files: UsedFile[] };
+
+export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
+  const { setCurrentFolder, setCurrentFiles, getFilesByFolder, cacheFiles } =
     useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
 
-  const changeFolder = async (folder: UsedFolder) => {
-    setCurrentFolder(folder);
+  useEffect(() => {
+    folders.forEach((folder) => {
+      cacheFiles(folder.id, folder.files);
+    });
+  }, [folders, cacheFiles]);
 
-    const files = await readFilesAction(folder.id);
-    if (files.length > 0) {
-      setCurrentFiles(files);
-      setCurrentFile(files[0]);
-    } else {
-      const file = await createFileAction(folder.id, 0);
-      setCurrentFiles([file]);
-      setCurrentFile(file);
-    }
-  };
+  const changeFolder = useCallback(
+    async (folder: UsedFolder) => {
+      setCurrentFolder(folder);
+
+      const files = getFilesByFolder(folder.id);
+      if (files.length > 0) {
+        setCurrentFiles(files);
+        setCurrentFile(files[0]);
+      } else {
+        const file = await createFileAction(folder.id, 0);
+        cacheFiles(folder.id, [file]);
+        setCurrentFiles([file]);
+        setCurrentFile(file);
+      }
+    },
+    [setCurrentFolder, getFilesByFolder, setCurrentFiles, setCurrentFile, cacheFiles],
+  );
 
   return (
     <SidebarGroup>

@@ -30,6 +30,9 @@ interface SidebarState {
 
   insertFileAfterCurrent: (newFile: UsedFile, currentPage: number) => void;
 
+  filesCache: Record<number, UsedFile[]>;
+  cacheFiles: (folderId: number, files: UsedFile[]) => void;
+
   isEditingFolder: boolean;
   setIsEditingFolder: (isEditingFolder: boolean) => void;
 
@@ -41,7 +44,6 @@ interface SidebarState {
 
   isDeleting: boolean;
   setIsDeleting: (isDeletingFile: boolean) => void;
-
   getFilesByFolder: (folderId: number) => UsedFile[];
 }
 
@@ -56,21 +58,39 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
   setFolders: (folders) => set({ folders }),
 
   currentFiles: [],
-  setCurrentFiles: (currentFiles) => set({ currentFiles }),
+  setCurrentFiles: (currentFiles) =>
+    set((state) => ({
+      currentFiles,
+      filesCache: state.currentFolder
+        ? { ...state.filesCache, [state.currentFolder.id]: currentFiles }
+        : state.filesCache,
+    })),
 
   updateFileContent: (fileId: number, content: string) =>
-    set((state) => ({
-      currentFiles: state.currentFiles.map((file) =>
+    set((state) => {
+      const updatedFiles = state.currentFiles.map((file) =>
         file.id === fileId ? { ...file, content } : file,
-      ),
-    })),
+      );
+      return {
+        currentFiles: updatedFiles,
+        filesCache: state.currentFolder
+          ? { ...state.filesCache, [state.currentFolder.id]: updatedFiles }
+          : state.filesCache,
+      };
+    }),
 
   updateFileTitle: (fileId: number, title: string) =>
-    set((state) => ({
-      currentFiles: state.currentFiles.map((file) =>
+    set((state) => {
+      const updatedFiles = state.currentFiles.map((file) =>
         file.id === fileId ? { ...file, title } : file,
-      ),
-    })),
+      );
+      return {
+        currentFiles: updatedFiles,
+        filesCache: state.currentFolder
+          ? { ...state.filesCache, [state.currentFolder.id]: updatedFiles }
+          : state.filesCache,
+      };
+    }),
 
   insertFileAfterCurrent: (newFile, currentPage) =>
     set((state) => {
@@ -79,9 +99,13 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
       );
 
       updatedFiles.push(newFile);
+      const sortedFiles = updatedFiles.sort((a, b) => a.page - b.page);
 
       return {
-        currentFiles: updatedFiles.sort((a, b) => a.page - b.page),
+        currentFiles: sortedFiles,
+        filesCache: state.currentFolder
+          ? { ...state.filesCache, [state.currentFolder.id]: sortedFiles }
+          : state.filesCache,
       };
     }),
 
@@ -97,8 +121,14 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
   isDeleting: false,
   setIsDeleting: (isDeleting) => set({ isDeleting }),
 
+  filesCache: {},
+  cacheFiles: (folderId, files) =>
+    set((state) => ({
+      filesCache: { ...state.filesCache, [folderId]: files },
+    })),
+
   getFilesByFolder: (folderId: number) => {
-    const { currentFiles, currentFolder } = get();
-    return currentFolder?.id === folderId ? currentFiles : [];
+    const { filesCache } = get();
+    return filesCache[folderId] || [];
   },
 }));

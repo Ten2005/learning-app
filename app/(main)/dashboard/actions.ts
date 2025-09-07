@@ -30,7 +30,13 @@ export async function createFolderAction(name: string) {
 export async function readFoldersAction() {
   try {
     const folders = await readFolders();
-    return folders;
+    const foldersWithFiles = await Promise.all(
+      folders.map(async (folder) => ({
+        ...folder,
+        files: await readFiles(folder.id),
+      })),
+    );
+    return foldersWithFiles;
   } catch (error) {
     console.error("Error getting folders:", error);
     throw new Error("Failed to get folders");

@@ -24,9 +24,10 @@ import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "./message";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, type UIMessage } from "ai";
 import { models } from "@/store/chat";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 export function SearchSheet() {
   const {
@@ -37,15 +38,56 @@ export function SearchSheet() {
     isSending,
     setIsSending,
   } = useChatStore();
+  const [conversationId, setConversationId] = useState<number | null>(null);
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { model: selectedModel },
+        body: { model: selectedModel, conversationId },
       }),
-    [selectedModel],
+    [selectedModel, conversationId],
   );
-  const { messages, setMessages, sendMessage } = useChat({ transport });
+  const { messages, setMessages, sendMessage } = useChat<
+    UIMessage<{ conversationId?: number }>
+  >({
+    transport,
+    onFinish: ({ message }) => {
+      const convId = message.metadata?.conversationId;
+      if (convId && !conversationId) {
+        setConversationId(convId);
+        window.localStorage.setItem("conversationId", String(convId));
+      }
+    },
+  });
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("conversationId");
+    if (stored) {
+      setConversationId(Number(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!conversationId) return;
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("messages")
+        .select("id, role, content")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true });
+      if (!error && data) {
+        setMessages(
+          data.map((m) => ({
+            id: String(m.id),
+            role: m.role,
+            parts: [{ type: "text", text: m.content }],
+          })),
+        );
+      }
+    };
+    load();
+  }, [conversationId, setMessages]);
 
   return (
     <Sheet>

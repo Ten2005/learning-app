@@ -42,10 +42,7 @@ interface SidebarState {
   isDeleting: boolean;
   setIsDeleting: (isDeletingFile: boolean) => void;
 
-  // In-memory per-folder cache for faster folder switching
-  filesByFolder: Record<number, UsedFile[]>;
-  setFilesForFolder: (folderId: number, files: UsedFile[]) => void;
-  getFilesByFolder: (folderId: number) => UsedFile[] | undefined;
+  getFilesByFolder: (folderId: number) => UsedFile[];
 }
 
 export const useSidebarStore = create<SidebarState>((set, get) => ({
@@ -59,51 +56,21 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
   setFolders: (folders) => set({ folders }),
 
   currentFiles: [],
-  setCurrentFiles: (currentFiles) =>
-    set((state) => {
-      const updated: Partial<SidebarState> = { currentFiles };
-      if (state.currentFolder) {
-        updated.filesByFolder = {
-          ...state.filesByFolder,
-          [state.currentFolder.id]: currentFiles,
-        };
-      }
-      return updated as SidebarState;
-    }),
+  setCurrentFiles: (currentFiles) => set({ currentFiles }),
 
   updateFileContent: (fileId: number, content: string) =>
-    set((state) => {
-      const updatedCurrentFiles = state.currentFiles.map((file) =>
+    set((state) => ({
+      currentFiles: state.currentFiles.map((file) =>
         file.id === fileId ? { ...file, content } : file,
-      );
-      const updated: Partial<SidebarState> = {
-        currentFiles: updatedCurrentFiles,
-      };
-      if (state.currentFolder) {
-        updated.filesByFolder = {
-          ...state.filesByFolder,
-          [state.currentFolder.id]: updatedCurrentFiles,
-        };
-      }
-      return updated as SidebarState;
-    }),
+      ),
+    })),
 
   updateFileTitle: (fileId: number, title: string) =>
-    set((state) => {
-      const updatedCurrentFiles = state.currentFiles.map((file) =>
+    set((state) => ({
+      currentFiles: state.currentFiles.map((file) =>
         file.id === fileId ? { ...file, title } : file,
-      );
-      const updated: Partial<SidebarState> = {
-        currentFiles: updatedCurrentFiles,
-      };
-      if (state.currentFolder) {
-        updated.filesByFolder = {
-          ...state.filesByFolder,
-          [state.currentFolder.id]: updatedCurrentFiles,
-        };
-      }
-      return updated as SidebarState;
-    }),
+      ),
+    })),
 
   insertFileAfterCurrent: (newFile, currentPage) =>
     set((state) => {
@@ -130,16 +97,8 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
   isDeleting: false,
   setIsDeleting: (isDeleting) => set({ isDeleting }),
 
-  filesByFolder: {},
-  setFilesForFolder: (folderId: number, files: UsedFile[]) =>
-    set((state) => ({
-      filesByFolder: {
-        ...state.filesByFolder,
-        [folderId]: files,
-      },
-    })),
   getFilesByFolder: (folderId: number) => {
-    const { filesByFolder } = get();
-    return filesByFolder[folderId];
+    const { currentFiles, currentFolder } = get();
+    return currentFolder?.id === folderId ? currentFiles : [];
   },
 }));

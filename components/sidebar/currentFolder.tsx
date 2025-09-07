@@ -27,13 +27,8 @@ import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 import CreatePageButton from "./createPageButton";
 
 export default function CurrentFolder() {
-  const {
-    currentFolder,
-    currentFiles,
-    setCurrentFiles,
-    setIsDeleting,
-    setFilesForFolder,
-  } = useSidebarStore();
+  const { currentFolder, currentFiles, setCurrentFiles, setIsDeleting } =
+    useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
 
   const handleDeleteFile = async (fileId: number) => {
@@ -54,14 +49,10 @@ export default function CurrentFolder() {
       .sort((a, b) => a.page - b.page);
 
     setCurrentFiles(filteredFiles);
-    if (currentFolder) {
-      setFilesForFolder(currentFolder.id, filteredFiles);
-    }
 
     if (filteredFiles.length === 0 && currentFolder) {
       const file = await createFileAction(currentFolder.id, 0);
       setCurrentFiles([file]);
-      setFilesForFolder(currentFolder.id, [file]);
       setCurrentFile(file);
     }
     setIsDeleting(false);

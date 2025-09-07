@@ -11,6 +11,7 @@ import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 import { SearchSheet } from "@/components/chat/searchSheet";
 import { useCallback } from "react";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const {
@@ -131,30 +132,22 @@ function ShowTitle() {
   return (
     <div className="flex flex-row items-center">
       <span className="text-xs text-muted-foreground px-1">
-        ({currentFolder?.name})
+        {currentFolder?.name} -&gt; {currentFile?.page} :
       </span>
-      <span className="text-xs text-muted-foreground px-1">
-        {currentFile?.page}
-      </span>
-      {currentFile?.title ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsEditingTitle(true)}
-          asChild
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsEditingTitle(true)}
+        asChild
+      >
+        <Label
+          className={cn(
+            currentFile?.title ? "text-primary" : "text-muted-foreground",
+          )}
         >
-          <Label className="text-primary"> {currentFile?.title}</Label>
-        </Button>
-      ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsEditingTitle(true)}
-          asChild
-        >
-          <Label className="text-muted-foreground">None</Label>
-        </Button>
-      )}
+          {currentFile?.title ? currentFile.title : "None"}
+        </Label>
+      </Button>
     </div>
   );
 }

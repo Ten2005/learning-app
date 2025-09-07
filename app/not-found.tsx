@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 export function LinkAsButton() {
   return (
     <Button asChild variant={"link"}>
-      <Link href="/dashboard">Top Page</Link>
+      <Link href="/">Top Page</Link>
     </Button>
   );
 }

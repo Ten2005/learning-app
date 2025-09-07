@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2Icon } from "lucide-react";
+import { Loader2Icon, Trash2Icon } from "lucide-react";
 import { useSidebarStore } from "@/store/sidebar";
 
 export default function DeleteConfirmationDialog({
@@ -24,8 +24,17 @@ export default function DeleteConfirmationDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-destructive">
-          <Trash2Icon className="w-4 h-4" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-destructive"
+          disabled={isDeleting}
+        >
+          {isDeleting ? (
+            <Loader2Icon className="w-4 h-4 animate-spin" />
+          ) : (
+            <Trash2Icon className="w-4 h-4" />
+          )}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -40,7 +49,11 @@ export default function DeleteConfirmationDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={deleteFunction} disabled={isDeleting}>
-            Delete
+            {isDeleting ? (
+              <Loader2Icon className="w-4 h-4 animate-spin" />
+            ) : (
+              "Delete"
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

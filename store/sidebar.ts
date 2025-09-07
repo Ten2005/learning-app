@@ -41,9 +41,6 @@ interface SidebarState {
 
   isCreatingFolder: boolean;
   setIsCreatingFolder: (isCreatingFolder: boolean) => void;
-
-  isDeleting: boolean;
-  setIsDeleting: (isDeletingFile: boolean) => void;
   getFilesByFolder: (folderId: number) => UsedFile[];
 }
 
@@ -117,9 +114,6 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
 
   isCreatingFolder: false,
   setIsCreatingFolder: (isCreatingFolder) => set({ isCreatingFolder }),
-
-  isDeleting: false,
-  setIsDeleting: (isDeleting) => set({ isDeleting }),
 
   filesCache: {},
   cacheFiles: (folderId, files) =>

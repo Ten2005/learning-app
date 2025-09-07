@@ -15,11 +15,13 @@ import { CheckIcon, Folder, PencilIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
+import { useRouter } from "next/navigation";
 import {
   deleteFolderAction,
   deleteFileAction,
   updateFolderAction,
   createFileAction,
+  readFoldersAction,
 } from "@/app/(main)/dashboard/actions";
 import { Input } from "../ui/input";
 import { UsedFolder } from "@/store/sidebar";
@@ -27,9 +29,8 @@ import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 import CreatePageButton from "./createPageButton";
 
 export default function CurrentFolder() {
-  const { currentFolder, currentFiles, setCurrentFiles, setIsDeleting } =
-    useSidebarStore();
-  const { setCurrentFile } = useDashboardStore();
+  const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
+  const { currentFile, setCurrentFile } = useDashboardStore();
 
   const handleDeleteFile = async (fileId: number) => {
     if (!currentFolder) return;
@@ -37,7 +38,6 @@ export default function CurrentFolder() {
     const fileToDelete = currentFiles.find((file) => file.id === fileId);
     if (!fileToDelete) return;
 
-    setIsDeleting(true);
     await deleteFileAction(fileId, currentFolder.id, fileToDelete.page);
 
     const filteredFiles = currentFiles
@@ -54,8 +54,13 @@ export default function CurrentFolder() {
       const file = await createFileAction(currentFolder.id, 0);
       setCurrentFiles([file]);
       setCurrentFile(file);
+    } else {
+      const updatedCurrent =
+        currentFile?.id === fileId
+          ? filteredFiles[0]
+          : filteredFiles.find((file) => file.id === currentFile?.id);
+      if (updatedCurrent) setCurrentFile(updatedCurrent);
     }
-    setIsDeleting(false);
   };
 
   if (!currentFolder)
@@ -128,8 +133,15 @@ export default function CurrentFolder() {
 }
 
 function EditFolder({ currentFolder }: { currentFolder: UsedFolder }) {
-  const { isEditingFolder, setIsEditingFolder, setCurrentFolder } =
-    useSidebarStore();
+  const {
+    isEditingFolder,
+    setIsEditingFolder,
+    setCurrentFolder,
+    setCurrentFiles,
+    cacheFiles,
+  } = useSidebarStore();
+  const { setCurrentFile } = useDashboardStore();
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentFolder({ ...currentFolder, name: e.target.value });
@@ -142,9 +154,23 @@ function EditFolder({ currentFolder }: { currentFolder: UsedFolder }) {
     setIsEditingFolder(!isEditingFolder);
   };
 
-  const handleDeleteFolder = () => {
-    deleteFolderAction(currentFolder.id);
-    setCurrentFolder(undefined);
+  const handleDeleteFolder = async () => {
+    await deleteFolderAction(currentFolder.id);
+
+    const folders = await readFoldersAction();
+    if (folders.length > 0) {
+      const first = folders[0];
+      setCurrentFolder(first);
+      cacheFiles(first.id, first.files);
+      setCurrentFiles(first.files);
+      setCurrentFile(first.files[0] ?? undefined);
+    } else {
+      setCurrentFolder(undefined);
+      setCurrentFiles([]);
+      setCurrentFile(undefined);
+    }
+
+    router.refresh();
   };
 
   return (

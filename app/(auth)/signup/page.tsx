@@ -11,8 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth";
 import { PRODUCT_NAME } from "@/constants";
 import { signup } from "@/lib/auth/signup";
@@ -23,7 +24,13 @@ export default function Signup() {
 
   const handleSignup = async () => {
     await setIsLoading(true);
-    await signup(email, password);
+    const { error } = await signup(email, password);
+    await setIsLoading(false);
+    if (!error) {
+      toast("Check your email", {
+        description: "A confirmation link has been sent to your inbox",
+      });
+    }
   };
 
   return (
@@ -66,6 +73,9 @@ export default function Signup() {
               onClick={handleSignup}
               disabled={isLoading}
             >
+              {isLoading && (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              )}
               Signup
             </Button>
           </CardAction>

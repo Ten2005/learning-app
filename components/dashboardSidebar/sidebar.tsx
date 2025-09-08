@@ -7,8 +7,8 @@ import {
 
 import NewFolderDialog from "./newFolderDialog";
 import { readFoldersAction } from "@/app/(main)/dashboard/actions";
-import Folders from "@/components/sidebar/folders";
-import CurrentFolder from "@/components/sidebar/currentFolder";
+import Folders from "@/components/dashboardSidebar/folders";
+import CurrentFolder from "@/components/dashboardSidebar/currentFolder";
 import { ModeToggle } from "../modeToggle";
 
 export async function DashboardSidebar() {

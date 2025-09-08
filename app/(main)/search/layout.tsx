@@ -1,12 +1,12 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { DashboardSidebar } from "@/components/dashboardSidebar/sidebar";
+import { SearchSidebar } from "@/components/searchSidebar/sidebar";
 
 export const dynamic = "force-dynamic";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <DashboardSidebar />
+      <SearchSidebar />
       <main className="w-full">
         <SidebarTrigger />
         {children}

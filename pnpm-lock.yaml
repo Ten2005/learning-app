@@ -4812,10 +4812,7 @@ packages:
       }
 
   sonner@1.5.0:
-    resolution:
-      {
-        integrity: "",
-      }
+    resolution: { integrity: "" }
     peerDependencies:
       react: ">=18"
       react-dom: ">=18"

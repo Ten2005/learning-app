@@ -41,7 +41,13 @@ export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
         setCurrentFile(file);
       }
     },
-    [setCurrentFolder, getFilesByFolder, setCurrentFiles, setCurrentFile, cacheFiles],
+    [
+      setCurrentFolder,
+      getFilesByFolder,
+      setCurrentFiles,
+      setCurrentFile,
+      cacheFiles,
+    ],
   );
 
   return (

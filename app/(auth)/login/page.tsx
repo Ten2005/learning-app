@@ -70,9 +70,7 @@ export default function Login() {
               onClick={handleLogin}
               disabled={isLoading}
             >
-              {isLoading && (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              )}
+              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Login
             </Button>
           </CardAction>

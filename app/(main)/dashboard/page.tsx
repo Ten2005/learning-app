@@ -9,9 +9,10 @@ import PageButtons from "@/components/dashboard/pageButton";
 import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
-import { SearchSheet } from "@/components/chat/searchSheet";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { TelescopeIcon } from "lucide-react";
 
 export default function Dashboard() {
   const {
@@ -74,7 +75,11 @@ export default function Dashboard() {
           {currentFolder && <PageButtons />}
         </div>
         <div className="flex flex-row justify-end items-center border-b py-1">
-          <SearchSheet />
+          <Button variant="outline" size="icon" asChild>
+            <Link href="/search">
+              <TelescopeIcon className="size-4" />
+            </Link>
+          </Button>
         </div>
       </div>
       <Textarea

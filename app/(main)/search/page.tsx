@@ -42,9 +42,8 @@ export default function SearchPage() {
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        body: { model: selectedModel },
       }),
-    [selectedModel],
+    [],
   );
   const conversationIdRef = useRef<number | null>(null);
   useEffect(() => {
@@ -160,7 +159,10 @@ export default function SearchPage() {
                 "user",
               );
               setCurrentConversationId(returnConversationId);
-              await sendMessage({ text: sendInput });
+              await sendMessage(
+                { text: sendInput },
+                { body: { model: selectedModel } },
+              );
             } finally {
               setIsSending(false);
             }

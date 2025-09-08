@@ -44,6 +44,9 @@ interface ChatStore {
 
   selectedModel: Model;
   setSelectedModel: (selectedModel: Model) => void;
+
+  currentConversationId: number | null;
+  setCurrentConversationId: (id: number | null) => void;
 }
 
 export const useChatStore = create<ChatStore>((set) => ({
@@ -69,4 +72,8 @@ export const useChatStore = create<ChatStore>((set) => ({
   setIsIncludeContext: (isIncludeContext) => set({ isIncludeContext }),
   selectedModel: models[0],
   setSelectedModel: (selectedModel: Model) => set({ selectedModel }),
+
+  currentConversationId: null,
+  setCurrentConversationId: (id: number | null) =>
+    set({ currentConversationId: id }),
 }));

@@ -3,24 +3,34 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
 } from "@/components/ui/sidebar";
 
 import { ModeToggle } from "../modeToggle";
-import { Button } from "../ui/button";
-import Link from "next/link";
+import { readConversationsAction } from "@/app/(main)/search/actions";
+import ConversationItem from "@/components/searchSidebar/conversationItem";
 
 export async function SearchSidebar() {
+  const conversations = await readConversationsAction();
   return (
     <Sidebar>
-      <div className="flex justify-between p-1">
+      <SidebarHeader>
         <ModeToggle />
-        <Button variant="link" asChild>
-          <Link href="/dashboard">dashboard</Link>
-        </Button>
-      </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent></SidebarGroupContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {conversations.map((conversation) => (
+                <ConversationItem
+                  key={conversation.id}
+                  id={conversation.id}
+                  title={conversation.title}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

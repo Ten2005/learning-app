@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  SidebarMenuAction,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarMenuButton,
 } from "../ui/sidebar";
 import {
   Accordion,
@@ -89,37 +91,36 @@ export default function CurrentFolder() {
             </AccordionTrigger>
             <AccordionContent>
               {currentFiles.map((file) => (
-                <Button
+                <SidebarMenuButton
                   key={file.id}
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground p-0 justify-between w-full"
                   onClick={() => {
                     setCurrentFile(file);
                   }}
                   asChild
                 >
-                  <div>
+                  <div className="flex items-center justify-between w-full">
                     <span>
                       {file.page} :{" "}
                       {file.title
-                        ? file.title.length > 7
-                          ? file.title.slice(0, 7) + "..."
+                        ? file.title.length > 10
+                          ? file.title.slice(0, 10) + "..."
                           : file.title
                         : "None"}
                     </span>
-                    <span
+                    <SidebarMenuAction
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
+                      asChild
+                      showOnHover
                     >
                       <DeleteConfirmationDialog
                         deleteFunction={() => handleDeleteFile(file.id)}
                         target={file.title || "None"}
                       />
-                    </span>
+                    </SidebarMenuAction>
                   </div>
-                </Button>
+                </SidebarMenuButton>
               ))}
             </AccordionContent>
           </AccordionItem>

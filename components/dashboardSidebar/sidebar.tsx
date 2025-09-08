@@ -3,6 +3,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 
 import NewFolderDialog from "./newFolderDialog";
@@ -15,9 +16,9 @@ export async function DashboardSidebar() {
   const folders = await readFoldersAction();
   return (
     <Sidebar>
-      <div className="flex justify-start p-1">
+      <SidebarHeader>
         <ModeToggle />
-      </div>
+      </SidebarHeader>
       <SidebarContent>
         <CurrentFolder />
         <Folders folders={folders} />

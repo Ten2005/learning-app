@@ -75,8 +75,8 @@ export default function Dashboard() {
           {currentFolder && <PageButtons />}
         </div>
         <div className="flex flex-row justify-end items-center border-b py-1">
-          <Button variant="outline" size="icon" asChild>
-            <Link href="/search">
+          <Button size="icon" asChild>
+            <Link href="/search" prefetch>
               <TelescopeIcon className="size-4" />
             </Link>
           </Button>

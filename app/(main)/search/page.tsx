@@ -14,11 +14,22 @@ import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, UIMessage } from "ai";
 import { models } from "@/store/chat";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
+import Link from "next/link";
+import { saveMessageAction, readMessagesAction } from "./actions";
+import { useSearchParams } from "next/navigation";
+import type { DbMessage } from "@/lib/db/chat";
+
+type TextPart = Extract<UIMessage["parts"][number], { type: "text" }>;
+function isTextPart(part: UIMessage["parts"][number]): part is TextPart {
+  return part.type === "text";
+}
 
 export default function SearchPage() {
+  const { currentConversationId, setCurrentConversationId } = useChatStore();
+  const searchParams = useSearchParams();
   const {
     input,
     setInput,
@@ -35,15 +46,80 @@ export default function SearchPage() {
       }),
     [selectedModel],
   );
-  const { messages, setMessages, sendMessage } = useChat({ transport });
+  const conversationIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    conversationIdRef.current = currentConversationId;
+  }, [currentConversationId]);
+  const { messages, setMessages, sendMessage } = useChat({
+    transport,
+    onFinish: async ({ message }) => {
+      try {
+        const text = (message.parts ?? [])
+          .map((part) => (isTextPart(part) ? part.text : ""))
+          .join("");
+        if (text) {
+          const savedId = await saveMessageAction(
+            conversationIdRef.current,
+            text,
+            "assistant",
+          );
+          if (!conversationIdRef.current) setCurrentConversationId(savedId);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+  });
+
+  useEffect(() => {
+    const c = searchParams.get("c");
+    const parsed = c ? Number(c) : null;
+    if (!parsed || Number.isNaN(parsed)) {
+      setCurrentConversationId(null);
+      setMessages([]);
+      return;
+    }
+    setCurrentConversationId(parsed);
+    (async () => {
+      try {
+        const dbMessages = await readMessagesAction(parsed);
+        setMessages(
+          dbMessages.map((m: DbMessage) => ({
+            id: String(m.id),
+            role: m.role,
+            parts: [{ type: "text", text: m.content }],
+          })),
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [searchParams, setMessages, setCurrentConversationId]);
+
+  const handleClearChat = () => {
+    setMessages([]);
+    setCurrentConversationId(null);
+  };
 
   return (
     <div className="flex flex-col h-[100dvh] max-h-[100dvh]">
       <div className="flex flex-col gap-1 py-2 px-4">
-        <h1>Query Space</h1>
-        <p className="text-sm text-muted-foreground">Some description here.</p>
+        <div className="flex flex-row justify-between items-center">
+          <h1>Query Space</h1>
+          <Button variant="link" asChild>
+            <Link href="/dashboard" prefetch>
+              Back to Dashboard
+            </Link>
+          </Button>
+        </div>
         <div className="flex w-full justify-between items-center">
-          <Button variant="secondary" size="sm" onClick={() => setMessages([])}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              handleClearChat();
+            }}
+          >
             Clear Chat
           </Button>
           <Select value={selectedModel} onValueChange={setSelectedModel}>
@@ -78,6 +154,12 @@ export default function SearchPage() {
               setIsSending(true);
               const sendInput = await input;
               setInput("");
+              const returnConversationId = await saveMessageAction(
+                currentConversationId,
+                sendInput,
+                "user",
+              );
+              setCurrentConversationId(returnConversationId);
               await sendMessage({ text: sendInput });
             } finally {
               setIsSending(false);

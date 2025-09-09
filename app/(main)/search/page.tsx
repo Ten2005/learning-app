@@ -2,20 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2Icon } from "lucide-react";
 import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
 import { UIMessage } from "ai";
-import { models } from "@/store/chat";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { saveMessageAction, readMessagesAction } from "./actions";
@@ -33,8 +25,6 @@ export default function SearchPage() {
   const {
     input,
     setInput,
-    selectedModel,
-    setSelectedModel,
     isSending,
     setIsSending,
   } = useChatStore();
@@ -114,18 +104,6 @@ export default function SearchPage() {
           >
             Clear Chat
           </Button>
-          <Select value={selectedModel} onValueChange={setSelectedModel}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Model" />
-            </SelectTrigger>
-            <SelectContent>
-              {models.map((model) => (
-                <SelectItem key={model} value={model}>
-                  {model}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
       <div className="flex flex-col gap-4 px-4 overflow-y-auto h-full">
@@ -152,10 +130,7 @@ export default function SearchPage() {
                 "user",
               );
               setCurrentConversationId(returnConversationId);
-              await sendMessage(
-                { text: sendInput },
-                { body: { model: selectedModel } },
-              );
+              await sendMessage({ text: sendInput });
             } finally {
               setIsSending(false);
             }

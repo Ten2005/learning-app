@@ -4,19 +4,6 @@ export interface Message {
   role: "user" | "assistant" | "developer";
   content: string;
 }
-
-export const models = [
-  "gpt-5-nano",
-  "gpt-5-mini",
-  "gpt-5",
-  "o4-mini-deep-research",
-  "gpt-oss-20b",
-  "gpt-oss-120b",
-  "gpt-4.1",
-  "gpt-5-chat-latest",
-  "chatgpt-4o-latest",
-];
-type Model = (typeof models)[number];
 export interface UIMessage {
   id: string;
   content: string;
@@ -41,9 +28,6 @@ interface ChatStore {
 
   isIncludeContext: boolean;
   setIsIncludeContext: (isIncludeContext: boolean) => void;
-
-  selectedModel: Model;
-  setSelectedModel: (selectedModel: Model) => void;
 
   currentConversationId: number | null;
   setCurrentConversationId: (id: number | null) => void;
@@ -70,8 +54,6 @@ export const useChatStore = create<ChatStore>((set) => ({
 
   isIncludeContext: false,
   setIsIncludeContext: (isIncludeContext) => set({ isIncludeContext }),
-  selectedModel: models[0],
-  setSelectedModel: (selectedModel: Model) => set({ selectedModel }),
 
   currentConversationId: null,
   setCurrentConversationId: (id: number | null) =>

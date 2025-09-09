@@ -14,9 +14,9 @@ import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, UIMessage } from "ai";
+import { UIMessage } from "ai";
 import { models } from "@/store/chat";
-import { useMemo, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { saveMessageAction, readMessagesAction } from "./actions";
 import { useSearchParams } from "next/navigation";
@@ -38,20 +38,12 @@ export default function SearchPage() {
     isSending,
     setIsSending,
   } = useChatStore();
-  const transport = useMemo(
-    () =>
-      new DefaultChatTransport({
-        api: "/api/chat",
-        body: { model: selectedModel },
-      }),
-    [selectedModel],
-  );
   const conversationIdRef = useRef<number | null>(null);
   useEffect(() => {
     conversationIdRef.current = currentConversationId;
   }, [currentConversationId]);
   const { messages, setMessages, sendMessage } = useChat({
-    transport,
+    api: "/api/chat",
     onFinish: async ({ message }) => {
       try {
         const text = (message.parts ?? [])
@@ -160,7 +152,10 @@ export default function SearchPage() {
                 "user",
               );
               setCurrentConversationId(returnConversationId);
-              await sendMessage({ text: sendInput });
+              await sendMessage(
+                { text: sendInput },
+                { body: { model: selectedModel } },
+              );
             } finally {
               setIsSending(false);
             }

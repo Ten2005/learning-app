@@ -22,12 +22,7 @@ function isTextPart(part: UIMessage["parts"][number]): part is TextPart {
 export default function SearchPage() {
   const { currentConversationId, setCurrentConversationId } = useChatStore();
   const searchParams = useSearchParams();
-  const {
-    input,
-    setInput,
-    isSending,
-    setIsSending,
-  } = useChatStore();
+  const { input, setInput } = useChatStore();
   const conversationIdRef = useRef<number | null>(null);
   useEffect(() => {
     conversationIdRef.current = currentConversationId;
@@ -36,7 +31,7 @@ export default function SearchPage() {
     () => new DefaultChatTransport({ api: "/api/chat" }),
     [],
   );
-  const { messages, setMessages, sendMessage } = useChat({
+  const { messages, setMessages, sendMessage, status } = useChat({
     transport,
     onFinish: async ({ message }) => {
       try {
@@ -123,39 +118,34 @@ export default function SearchPage() {
         <form
           onSubmit={async (e) => {
             e.preventDefault();
-            if (!input || isSending) return;
-            try {
-              setIsSending(true);
-              const sendInput = await input;
-              setInput("");
-              const returnConversationId = await saveMessageAction(
-                currentConversationId,
-                sendInput,
-                "user",
-              );
-              setCurrentConversationId(returnConversationId);
-              await sendMessage({ text: sendInput });
-            } finally {
-              setIsSending(false);
-            }
+            if (!input || status !== "ready") return;
+            const sendInput = await input;
+            setInput("");
+            const returnConversationId = await saveMessageAction(
+              currentConversationId,
+              sendInput,
+              "user",
+            );
+            setCurrentConversationId(returnConversationId);
+            await sendMessage({ text: sendInput });
           }}
           className="flex w-full items-center gap-2"
         >
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            disabled={isSending}
+            disabled={status !== "ready"}
           />
           <Button
             type="submit"
             size="icon"
-            disabled={!input || isSending}
-            aria-busy={isSending}
+            disabled={!input || status !== "ready"}
+            aria-busy={status !== "ready"}
           >
-            {isSending ? (
-              <Loader2Icon className="size-4 animate-spin" />
-            ) : (
+            {status == "ready" ? (
               <SearchIcon className="size-4" />
+            ) : (
+              <Loader2Icon className="size-4 animate-spin" />
             )}
           </Button>
         </form>

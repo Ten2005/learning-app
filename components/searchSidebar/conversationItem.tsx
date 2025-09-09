@@ -46,7 +46,13 @@ export default function ConversationItem({
       <SidebarMenuButton onClick={handleOpen} asChild>
         <div className="flex items-center justify-between w-full">
           <span className="truncate">{displayTitle}</span>
-          <SidebarMenuAction asChild showOnHover>
+          <SidebarMenuAction
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            asChild
+            showOnHover
+          >
             <DeleteConfirmationDialog
               deleteFunction={handleDelete}
               target={title || "Conversation"}

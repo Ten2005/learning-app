@@ -193,10 +193,16 @@ function EditFolder({ currentFolder }: { currentFolder: UsedFolder }) {
             <PencilIcon className="w-4 h-4" />
           )}
         </Button>
-        <DeleteConfirmationDialog
-          deleteFunction={handleDeleteFolder}
-          target={currentFolder.name}
-        />
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <DeleteConfirmationDialog
+            deleteFunction={handleDeleteFolder}
+            target={currentFolder.name}
+          />
+        </div>
       </div>
     </div>
   );

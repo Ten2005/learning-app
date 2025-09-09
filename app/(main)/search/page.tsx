@@ -7,8 +7,8 @@ import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
-import { UIMessage } from "ai";
-import { useEffect, useRef } from "react";
+import { DefaultChatTransport, UIMessage } from "ai";
+import { useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { saveMessageAction, readMessagesAction } from "./actions";
 import { useSearchParams } from "next/navigation";
@@ -32,8 +32,12 @@ export default function SearchPage() {
   useEffect(() => {
     conversationIdRef.current = currentConversationId;
   }, [currentConversationId]);
+  const transport = useMemo(
+    () => new DefaultChatTransport({ api: "/api/chat" }),
+    [],
+  );
   const { messages, setMessages, sendMessage } = useChat({
-    api: "/api/chat",
+    transport,
     onFinish: async ({ message }) => {
       try {
         const text = (message.parts ?? [])

@@ -2,6 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2Icon } from "lucide-react";
 import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
@@ -13,6 +20,8 @@ import Link from "next/link";
 import { saveMessageAction, readMessagesAction } from "./actions";
 import { useSearchParams } from "next/navigation";
 import type { DbMessage } from "@/lib/db/chat";
+import { chatOptions } from "@/store/chat";
+import { ChatType } from "@/store/chat";
 
 type TextPart = Extract<UIMessage["parts"][number], { type: "text" }>;
 function isTextPart(part: UIMessage["parts"][number]): part is TextPart {
@@ -20,7 +29,12 @@ function isTextPart(part: UIMessage["parts"][number]): part is TextPart {
 }
 
 export default function SearchPage() {
-  const { currentConversationId, setCurrentConversationId } = useChatStore();
+  const {
+    currentConversationId,
+    setCurrentConversationId,
+    chatType,
+    setChatType,
+  } = useChatStore();
   const searchParams = useSearchParams();
   const { input, setInput } = useChatStore();
   const conversationIdRef = useRef<number | null>(null);
@@ -28,8 +42,8 @@ export default function SearchPage() {
     conversationIdRef.current = currentConversationId;
   }, [currentConversationId]);
   const transport = useMemo(
-    () => new DefaultChatTransport({ api: "/api/chat" }),
-    [],
+    () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
+    [chatType],
   );
   const { messages, setMessages, sendMessage, status } = useChat({
     transport,
@@ -103,6 +117,18 @@ export default function SearchPage() {
           >
             Clear Chat
           </Button>
+          <Select onValueChange={setChatType} defaultValue={chatType}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Theme" />
+            </SelectTrigger>
+            <SelectContent>
+              {chatOptions.map((value) => (
+                <SelectItem key={value} value={value as ChatType}>
+                  {value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="flex flex-col gap-4 px-4 overflow-y-auto h-full">

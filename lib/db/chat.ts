@@ -84,6 +84,23 @@ export async function readMessages(
   return messages;
 }
 
+export async function updateConversation(
+  title: string,
+  conversation_id: number,
+) {
+  const supabase = await createClient();
+  const user = await getUser();
+  const { error } = await supabase
+    .from("conversations")
+    .update({ title })
+    .eq("id", conversation_id)
+    .eq("user_id", user.id);
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to update conversation");
+  }
+}
+
 export async function deleteConversation(conversation_id: number) {
   const supabase = await createClient();
   const user = await getUser();

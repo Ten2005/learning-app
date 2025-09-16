@@ -9,6 +9,9 @@ export interface UIMessage {
   content: string;
   isUser: boolean;
 }
+export type ChatType = "general" | "fast" | "coding";
+
+export const chatOptions = ["general", "fast", "coding"] as const;
 interface ChatStore {
   input: string;
   setInput: (input: string) => void;
@@ -31,6 +34,9 @@ interface ChatStore {
 
   currentConversationId: number | null;
   setCurrentConversationId: (id: number | null) => void;
+
+  chatType: ChatType;
+  setChatType: (chatType: ChatType) => void;
 }
 
 export const useChatStore = create<ChatStore>((set) => ({
@@ -58,4 +64,7 @@ export const useChatStore = create<ChatStore>((set) => ({
   currentConversationId: null,
   setCurrentConversationId: (id: number | null) =>
     set({ currentConversationId: id }),
+
+  chatType: chatOptions[0],
+  setChatType: (chatType: ChatType) => set({ chatType }),
 }));

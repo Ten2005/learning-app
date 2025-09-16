@@ -7,6 +7,7 @@ import {
   readMessages,
   readConversations,
   deleteConversation,
+  updateConversation,
 } from "@/lib/db/chat";
 
 export async function saveMessageAction(
@@ -15,7 +16,9 @@ export async function saveMessageAction(
   role: string,
 ) {
   if (!conversation_id) {
-    const conversation = await createConversation(message);
+    const now = new Date();
+    const title = now.toLocaleString();
+    const conversation = await createConversation(title);
     conversation_id = conversation.id as number;
   }
   const insertedMessage = await addMessage(conversation_id, message, role);
@@ -32,6 +35,16 @@ export async function readMessagesAction(conversation_id: number) {
 export async function readConversationsAction() {
   const conversations = await readConversations();
   return conversations;
+}
+
+export async function updateConversationAction(
+  title: string,
+  conversation_id: number,
+) {
+  await updateConversation(title, conversation_id);
+  revalidatePath("/search");
+  revalidateTag("messages");
+  return title;
 }
 
 export async function deleteConversationAction(conversation_id: number) {

@@ -38,14 +38,11 @@ export default function ConversationItem({
     router.refresh();
   };
 
-  const displayTitle =
-    title.length > 10 ? `${title.substring(0, 10)}...` : title;
-
   return (
     <SidebarMenuItem>
       <SidebarMenuButton onClick={handleOpen} asChild>
         <div className="flex items-center justify-between w-full">
-          <span className="truncate">{displayTitle}</span>
+          <span className="truncate">{title}</span>
           <SidebarMenuAction asChild showOnHover>
             <DeleteConfirmationDialog
               deleteFunction={handleDelete}

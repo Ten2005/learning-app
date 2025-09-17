@@ -15,7 +15,9 @@ export function Message({
   isUser: boolean;
 }) {
   return (
-    <div className={cn("flex flex-row gap-2 items-end my-4", !isUser && "w-full")}>
+    <div
+      className={cn("flex flex-row gap-2 items-end my-4", !isUser && "w-full")}
+    >
       <div
         className={cn(
           "flex flex-col gap-2 text-sm",

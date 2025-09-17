@@ -1,14 +1,17 @@
 import { google } from "@ai-sdk/google";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
+import type { ToolSet } from "ai";
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
+  const tools = {
+    google_search: google.tools.googleSearch({}),
+  } as unknown as ToolSet;
+
   const result = streamText({
     model: google.chat("gemini-2.5-flash"),
-    tools: {
-      google_search: google.tools.googleSearch({}),
-    },
+    tools,
     messages: convertToModelMessages(messages),
   });
 

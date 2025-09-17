@@ -7,12 +7,21 @@ settings:
 importers:
   .:
     dependencies:
+      "@ai-sdk/anthropic":
+        specifier: ^2.0.17
+        version: 2.0.17(zod@4.0.14)
+      "@ai-sdk/google":
+        specifier: ^2.0.14
+        version: 2.0.14(zod@4.0.14)
       "@ai-sdk/openai":
         specifier: ^2.0.19
         version: 2.0.19(zod@4.0.14)
       "@ai-sdk/react":
         specifier: ^2.0.22
         version: 2.0.22(react@19.1.0)(zod@4.0.14)
+      "@ai-sdk/xai":
+        specifier: ^2.0.20
+        version: 2.0.20(zod@4.0.14)
       "@hookform/resolvers":
         specifier: ^5.2.1
         version: 5.2.1(react-hook-form@7.62.0(react@19.1.0))
@@ -142,10 +151,37 @@ importers:
         version: 5.9.2
 
 packages:
+  "@ai-sdk/anthropic@2.0.17":
+    resolution:
+      {
+        integrity: sha512-fEmGD3H3cI4ahcrtU/ekA6xvUq9kk/IpOh2TI3wOSxqvKqpo+ztwiem5/x5R92Yenl9KRooYIefr0LNlFUR5Ow==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      zod: ^3.25.76 || ^4
+
   "@ai-sdk/gateway@1.0.11":
     resolution:
       {
         integrity: sha512-ErwWS3sPOuWy42eE3AVxlKkTa1XjjKBEtNCOylVKMO5KNyz5qie8QVlLYbULOG56dtxX4zTKX3rQNJudplhcmQ==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      zod: ^3.25.76 || ^4
+
+  "@ai-sdk/google@2.0.14":
+    resolution:
+      {
+        integrity: sha512-OCBBkEUq1RNLkbJuD+ejqGsWDD0M5nRyuFWDchwylxy0J4HSsAiGNhutNYVTdnqmNw+r9LyZlkyZ1P4YfAfLdg==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      zod: ^3.25.76 || ^4
+
+  "@ai-sdk/openai-compatible@1.0.18":
+    resolution:
+      {
+        integrity: sha512-WSxF83ZVvTpj2vKhgSNe95qr46TaTBRitF7LlX817r1vKAHw3MDFjjrxZTHbR58jcQWX6N9B3D2aX2Ro9fPBNA==,
       }
     engines: { node: ">=18" }
     peerDependencies:
@@ -164,6 +200,15 @@ packages:
     resolution:
       {
         integrity: sha512-HliwB/yzufw3iwczbFVE2Fiwf1XqROB/I6ng8EKUsPM5+2wnIa8f4VbljZcDx+grhFrPV+PnRZH7zBqi8WZM7Q==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      zod: ^3.25.76 || ^4
+
+  "@ai-sdk/provider-utils@3.0.9":
+    resolution:
+      {
+        integrity: sha512-Pm571x5efqaI4hf9yW4KsVlDBDme8++UepZRnq+kqVBWWjgvGhQlzU8glaFq0YJEB9kkxZHbRRyVeHoV2sRYaQ==,
       }
     engines: { node: ">=18" }
     peerDependencies:
@@ -188,6 +233,15 @@ packages:
     peerDependenciesMeta:
       zod:
         optional: true
+
+  "@ai-sdk/xai@2.0.20":
+    resolution:
+      {
+        integrity: sha512-5hjOfYdJMtPirDPlN3rqKvW/GGpcXAKAtxTg0oQFxSDYYje5aeHzG/pY7RRwpn15opT8HKS4kxttA6CXirDwSQ==,
+      }
+    engines: { node: ">=18" }
+    peerDependencies:
+      zod: ^3.25.76 || ^4
 
   "@alloc/quick-lru@5.2.0":
     resolution:
@@ -4835,10 +4889,28 @@ packages:
       }
 
 snapshots:
+  "@ai-sdk/anthropic@2.0.17(zod@4.0.14)":
+    dependencies:
+      "@ai-sdk/provider": 2.0.0
+      "@ai-sdk/provider-utils": 3.0.9(zod@4.0.14)
+      zod: 4.0.14
+
   "@ai-sdk/gateway@1.0.11(zod@4.0.14)":
     dependencies:
       "@ai-sdk/provider": 2.0.0
       "@ai-sdk/provider-utils": 3.0.5(zod@4.0.14)
+      zod: 4.0.14
+
+  "@ai-sdk/google@2.0.14(zod@4.0.14)":
+    dependencies:
+      "@ai-sdk/provider": 2.0.0
+      "@ai-sdk/provider-utils": 3.0.9(zod@4.0.14)
+      zod: 4.0.14
+
+  "@ai-sdk/openai-compatible@1.0.18(zod@4.0.14)":
+    dependencies:
+      "@ai-sdk/provider": 2.0.0
+      "@ai-sdk/provider-utils": 3.0.9(zod@4.0.14)
       zod: 4.0.14
 
   "@ai-sdk/openai@2.0.19(zod@4.0.14)":
@@ -4855,6 +4927,13 @@ snapshots:
       zod: 4.0.14
       zod-to-json-schema: 3.24.6(zod@4.0.14)
 
+  "@ai-sdk/provider-utils@3.0.9(zod@4.0.14)":
+    dependencies:
+      "@ai-sdk/provider": 2.0.0
+      "@standard-schema/spec": 1.0.0
+      eventsource-parser: 3.0.5
+      zod: 4.0.14
+
   "@ai-sdk/provider@2.0.0":
     dependencies:
       json-schema: 0.4.0
@@ -4867,6 +4946,13 @@ snapshots:
       swr: 2.3.6(react@19.1.0)
       throttleit: 2.1.0
     optionalDependencies:
+      zod: 4.0.14
+
+  "@ai-sdk/xai@2.0.20(zod@4.0.14)":
+    dependencies:
+      "@ai-sdk/openai-compatible": 1.0.18(zod@4.0.14)
+      "@ai-sdk/provider": 2.0.0
+      "@ai-sdk/provider-utils": 3.0.9(zod@4.0.14)
       zod: 4.0.14
 
   "@alloc/quick-lru@5.2.0": {}

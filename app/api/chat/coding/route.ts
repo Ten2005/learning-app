@@ -1,15 +1,11 @@
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import { xai } from "@ai-sdk/xai";
 import { streamText, UIMessage, convertToModelMessages } from "ai";
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
-  const openrouter = createOpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY,
-  });
-
   const result = streamText({
-    model: openrouter.chat("x-ai/grok-code-fast-1"),
+    model: xai.chat("grok-code-fast-1"),
     messages: convertToModelMessages(messages),
   });
 

@@ -131,7 +131,7 @@ export default function SearchPage() {
           </Select>
         </div>
       </div>
-      <div className="flex flex-col gap-4 px-4 overflow-y-auto h-full">
+      <div className="flex flex-col gap-4 px-4 overflow-auto w-fit h-full">
         {messages.map((message) => (
           <Message
             key={message.id}

@@ -18,7 +18,7 @@ import { DefaultChatTransport, UIMessage } from "ai";
 import { useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { saveMessageAction, readMessagesAction } from "./actions";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import type { DbMessage } from "@/lib/db/chat";
 import { chatOptions } from "@/store/chat";
 import { ChatType } from "@/store/chat";
@@ -39,6 +39,7 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const { input, setInput } = useChatStore();
   const conversationIdRef = useRef<number | null>(null);
+  const router = useRouter();
   useEffect(() => {
     conversationIdRef.current = currentConversationId;
   }, [currentConversationId]);
@@ -95,6 +96,7 @@ export default function SearchPage() {
   const handleClearChat = () => {
     setMessages([]);
     setCurrentConversationId(null);
+    router.push("/search");
   };
 
   return (
@@ -116,7 +118,7 @@ export default function SearchPage() {
               handleClearChat();
             }}
           >
-            Clear Chat
+            New Chat
           </Button>
           <Select onValueChange={setChatType} defaultValue={chatType}>
             <SelectTrigger className="w-[180px]">
@@ -132,7 +134,7 @@ export default function SearchPage() {
           </Select>
         </div>
       </div>
-      <ScrollArea className="p-2">
+      <ScrollArea className="p-2 h-[100dvh]">
         {messages.map((message) => (
           <Message
             key={message.id}

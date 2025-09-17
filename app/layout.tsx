@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
+import type { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from "@/constants/index";
+import { AppPageLoading } from "@/components/loading/app-page-loading";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,7 +21,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -29,7 +32,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <Suspense fallback={<AppPageLoading />}>
+            {children}
+          </Suspense>
           <Toaster />
         </ThemeProvider>
       </body>

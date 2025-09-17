@@ -9,9 +9,9 @@ export interface UIMessage {
   content: string;
   isUser: boolean;
 }
-export type ChatType = "general" | "fast" | "coding";
+export type ChatType = "search" | "general" | "fast" | "coding";
 
-export const chatOptions = ["general", "fast", "coding"] as const;
+export const chatOptions = ["search", "general", "fast", "coding"] as const;
 interface ChatStore {
   input: string;
   setInput: (input: string) => void;

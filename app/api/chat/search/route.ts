@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   });
 
   const result = streamText({
-    model: openrouter.chat("google/gemini-2.5-flash:online"),
+    model: openrouter.chat("google/gemini-2.5-flash"),
     messages: convertToModelMessages(messages),
   });
 

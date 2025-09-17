@@ -1,3 +1,3 @@
-export const PRODUCT_NAME = "Digger";
+export const PRODUCT_NAME = "BeFast";
 export const PRODUCT_DESCRIPTION =
-  "Digger is a platform for creating personalized documents";
+  "BeFast is a platform for fast and efficient daily task management.";

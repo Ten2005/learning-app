@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -102,17 +102,15 @@ export default function SearchPage() {
   return (
     <div className="flex flex-col h-[100dvh] max-h-[100dvh]">
       <div className="flex flex-col gap-1 py-2 px-4">
-        <div className="flex flex-row justify-between items-center">
-          <h1>Query Space</h1>
-          <Button variant="link" asChild>
+        <div className="flex flex-row justify-end items-center">
+          <Button variant="secondary" size="sm" asChild>
             <Link href="/dashboard" prefetch>
-              Back to Dashboard
+              dashboard
             </Link>
           </Button>
         </div>
         <div className="flex w-full justify-between items-center">
           <Button
-            variant="secondary"
             size="sm"
             onClick={() => {
               handleClearChat();
@@ -159,12 +157,13 @@ export default function SearchPage() {
             setCurrentConversationId(returnConversationId);
             await sendMessage({ text: sendInput });
           }}
-          className="flex w-full items-center gap-2"
+          className="flex w-full items-start gap-2"
         >
-          <Input
+          <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={status !== "ready"}
+            className="resize-none"
           />
           <Button
             type="submit"

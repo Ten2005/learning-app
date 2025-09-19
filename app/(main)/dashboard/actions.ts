@@ -5,6 +5,7 @@ import {
   readFolders,
   updateFolder,
   deleteFolder,
+  updateFolderPinned,
 } from "@/lib/db/folder";
 import {
   createFile,
@@ -13,6 +14,7 @@ import {
   updateFile,
   incrementFilePages,
   renumberFilePages,
+  reorderFiles,
 } from "@/lib/db/file";
 import { revalidatePath, revalidateTag } from "next/cache";
 export async function createFolderAction(name: string) {
@@ -36,6 +38,13 @@ export async function readFoldersAction() {
         files: await readFiles(folder.id),
       })),
     );
+    // Sort: pinned first, then by name
+    foldersWithFiles.sort((a, b) => {
+      const ap = a.is_pinned ? 1 : 0;
+      const bp = b.is_pinned ? 1 : 0;
+      if (ap !== bp) return bp - ap;
+      return a.name.localeCompare(b.name);
+    });
     return foldersWithFiles;
   } catch (error) {
     console.error("Error getting folders:", error);
@@ -52,6 +61,18 @@ export async function updateFolderAction(id: number, name: string) {
   } catch (error) {
     console.error("Error updating folder:", error);
     throw new Error("Failed to update folder");
+  }
+}
+
+export async function toggleFolderPinnedAction(id: number, isPinned: boolean) {
+  try {
+    const folder = await updateFolderPinned(id, isPinned);
+    revalidatePath("/dashboard");
+    revalidateTag("folders");
+    return folder;
+  } catch (error) {
+    console.error("Error toggling folder pinned:", error);
+    throw new Error("Failed to toggle folder pinned state");
   }
 }
 
@@ -137,5 +158,19 @@ export async function deleteFileAction(
   } catch (error) {
     console.error("Error deleting file:", error);
     throw new Error("Failed to delete file");
+  }
+}
+
+export async function reorderFilesAction(
+  parent_id: number,
+  orderedIds: number[],
+) {
+  try {
+    await reorderFiles(parent_id, orderedIds);
+    revalidatePath("/dashboard");
+    revalidateTag("files");
+  } catch (error) {
+    console.error("Error reordering files:", error);
+    throw new Error("Failed to reorder files");
   }
 }

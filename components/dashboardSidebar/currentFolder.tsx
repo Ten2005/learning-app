@@ -24,15 +24,51 @@ import {
   updateFolderAction,
   createFileAction,
   readFoldersAction,
+  reorderFilesAction,
 } from "@/app/(main)/dashboard/actions";
 import { Input } from "../ui/input";
 import { UsedFolder } from "@/store/sidebar";
 import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 import CreatePageButton from "./createPageButton";
+import { useRef } from "react";
+import HighlightText from "@/utils/highlightText";
 
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
   const { currentFile, setCurrentFile } = useDashboardStore();
+  const dragIndexRef = useRef<number | null>(null);
+
+  const handleDragStart = (index: number) => (e: React.DragEvent) => {
+    dragIndexRef.current = index;
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (dropIndex: number) => async (e: React.DragEvent) => {
+    e.preventDefault();
+    const fromIndex = dragIndexRef.current;
+    dragIndexRef.current = null;
+    if (fromIndex === null || fromIndex === dropIndex) return;
+    const newOrder = [...currentFiles];
+    const [moved] = newOrder.splice(fromIndex, 1);
+    newOrder.splice(dropIndex, 0, moved);
+
+    const renumbered = newOrder.map((f, i) => ({ ...f, page: i }));
+    const orderedIds = renumbered.map((f) => f.id);
+
+    setCurrentFiles(renumbered);
+    if (currentFile) {
+      const updated = renumbered.find((f) => f.id === currentFile.id);
+      if (updated) setCurrentFile(updated);
+    }
+    if (currentFolder) {
+      await reorderFilesAction(currentFolder.id, orderedIds);
+    }
+  };
 
   const handleDeleteFile = async (fileId: number) => {
     if (!currentFolder) return;
@@ -65,6 +101,11 @@ export default function CurrentFolder() {
     }
   };
 
+  const convertShowTitle = (title: string) => {
+    if (title.length === 0) return "None";
+    return title.length > 10 ? title.slice(0, 10) + "..." : title;
+  };
+
   if (!currentFolder)
     return (
       <SidebarGroup>
@@ -90,7 +131,7 @@ export default function CurrentFolder() {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              {currentFiles.map((file) => (
+              {currentFiles.map((file, index) => (
                 <SidebarMenuButton
                   key={file.id}
                   onClick={() => {
@@ -98,14 +139,19 @@ export default function CurrentFolder() {
                   }}
                   asChild
                 >
-                  <div className="flex items-center justify-between w-full">
+                  <div
+                    className="flex items-center justify-between w-full"
+                    draggable
+                    onDragStart={handleDragStart(index)}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop(index)}
+                  >
                     <span>
-                      {file.page} :{" "}
-                      {file.title
-                        ? file.title.length > 10
-                          ? file.title.slice(0, 10) + "..."
-                          : file.title
-                        : "None"}
+                      {currentFile?.id === file.id ? (
+                        <HighlightText text={convertShowTitle(file.title)} />
+                      ) : (
+                        convertShowTitle(file.title)
+                      )}
                     </span>
                     <SidebarMenuAction
                       onClick={(e) => {

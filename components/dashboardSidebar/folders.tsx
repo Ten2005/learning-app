@@ -2,7 +2,7 @@
 
 import { UsedFolder, UsedFile } from "@/store/sidebar";
 import { Button } from "../ui/button";
-import { Folder } from "lucide-react";
+import { Folder, Pin, PinOff } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -12,13 +12,22 @@ import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
 import { createFileAction } from "@/app/(main)/dashboard/actions";
 import { useCallback, useEffect } from "react";
+import { toggleFolderPinnedAction } from "@/app/(main)/dashboard/actions";
+import { useRouter } from "next/navigation";
+import HighlightText from "@/utils/highlightText";
 
 type FolderWithFiles = UsedFolder & { files: UsedFile[] };
 
 export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
-  const { setCurrentFolder, setCurrentFiles, getFilesByFolder, cacheFiles } =
-    useSidebarStore();
+  const {
+    currentFolder,
+    setCurrentFolder,
+    setCurrentFiles,
+    getFilesByFolder,
+    cacheFiles,
+  } = useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
+  const router = useRouter();
 
   useEffect(() => {
     folders.forEach((folder) => {
@@ -61,13 +70,40 @@ export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
             size="sm"
             className="p-0 justify-start w-full"
             onClick={() => changeFolder(folder)}
+            asChild
           >
             <div
               id={folder.id.toString()}
-              className="flex items-center justify-start w-full"
+              className="flex items-center justify-between w-full"
             >
-              <Folder className="w-4 h-4 mr-2" />
-              {folder.name}
+              <div className="flex items-center">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="p-1"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    await toggleFolderPinnedAction(
+                      folder.id,
+                      !folder.is_pinned,
+                    );
+                    router.refresh();
+                  }}
+                  aria-label={folder.is_pinned ? "Unpin folder" : "Pin folder"}
+                  title={folder.is_pinned ? "Unpin" : "Pin"}
+                >
+                  {folder.is_pinned ? (
+                    <Pin className="text-primary" />
+                  ) : (
+                    <PinOff className="text-muted" />
+                  )}
+                </Button>
+                {currentFolder?.id === folder.id ? (
+                  <HighlightText text={folder.name} />
+                ) : (
+                  folder.name
+                )}
+              </div>
             </div>
           </Button>
         ))}

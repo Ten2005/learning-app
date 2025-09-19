@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { shallow } from "zustand/shallow";
 
 export interface UsedFolder {
   id: number;
   name: string;
+  is_pinned: boolean;
 }
 
 export interface UsedFile {

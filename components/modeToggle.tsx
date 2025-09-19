@@ -12,6 +12,73 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const themes = [
+  {
+    name: "Default Dark",
+    value: "default-dark",
+  },
+  {
+    name: "Red Dark",
+    value: "red-dark",
+  },
+  {
+    name: "Rose Dark",
+    value: "rose-dark",
+  },
+  {
+    name: "Orange Dark",
+    value: "orange-dark",
+  },
+  {
+    name: "Green Dark",
+    value: "green-dark",
+  },
+  {
+    name: "Blue Dark",
+    value: "blue-dark",
+  },
+  {
+    name: "Yellow Dark",
+    value: "yellow-dark",
+  },
+  {
+    name: "Violet Dark",
+    value: "violet-dark",
+  },
+  {
+    name: "Default Light",
+    value: "default-light",
+  },
+  {
+    name: "Red Light",
+    value: "red-light",
+  },
+  {
+    name: "Rose Light",
+    value: "rose-light",
+  },
+  {
+    name: "Orange Light",
+    value: "orange-light",
+  },
+  {
+    name: "Green Light",
+    value: "green-light",
+  },
+  {
+    name: "Blue Light",
+    value: "blue-light",
+  },
+  {
+    name: "Yellow Light",
+    value: "yellow-light",
+  },
+  {
+    name: "Violet Light",
+    value: "violet-light",
+  },
+];
+
 export function ModeToggle() {
   const { setTheme } = useTheme();
 
@@ -25,15 +92,17 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
+        {themes.map((theme) => (
+          <DropdownMenuItem
+            key={theme.value}
+            onClick={() => {
+              setTheme(theme.value);
+              window.location.reload();
+            }}
+          >
+            {theme.name}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

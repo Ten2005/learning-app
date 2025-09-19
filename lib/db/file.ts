@@ -145,3 +145,26 @@ export async function renumberFilePages(
     }),
   );
 }
+
+export async function reorderFiles(parent_id: number, orderedIds: number[]) {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  const updates = await Promise.all(
+    orderedIds.map(async (id, index) => {
+      const { error } = await supabase
+        .from("file")
+        .update({ page: index })
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .eq("parent_id", parent_id);
+      if (error) {
+        console.error(`Failed to set page for file ${id}:`, error);
+        throw new Error(`Failed to reorder files`);
+      }
+      return true;
+    }),
+  );
+
+  return updates;
+}

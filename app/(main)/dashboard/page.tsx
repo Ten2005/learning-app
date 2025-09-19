@@ -12,7 +12,6 @@ import { updateFileAction } from "./actions";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { TelescopeIcon } from "lucide-react";
 
 export default function Dashboard() {
   const {
@@ -74,10 +73,10 @@ export default function Dashboard() {
           {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
           {currentFolder && <PageButtons />}
         </div>
-        <div className="flex flex-row justify-end items-center border-b py-1">
-          <Button size="icon" asChild>
+        <div className="flex flex-row justify-end items-center py-1">
+          <Button variant="secondary" size="sm" asChild>
             <Link href="/search" prefetch>
-              <TelescopeIcon className="size-4" />
+              search
             </Link>
           </Button>
         </div>

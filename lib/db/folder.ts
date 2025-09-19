@@ -21,7 +21,7 @@ export async function readFolders() {
   const user = await getUser();
   const { data, error } = await supabase
     .from("folder")
-    .select("id, name")
+    .select("id, name, is_pinned")
     .eq("user_id", user.id)
     .eq("is_deleted", false);
   if (error) {
@@ -57,6 +57,21 @@ export async function deleteFolder(id: number) {
   if (error) {
     console.error(error);
     throw new Error("Failed to delete folder");
+  }
+  return data;
+}
+
+export async function updateFolderPinned(id: number, is_pinned: boolean) {
+  const supabase = await createClient();
+  const user = await getUser();
+  const { data, error } = await supabase
+    .from("folder")
+    .update({ is_pinned })
+    .eq("id", id)
+    .eq("user_id", user.id);
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to update folder pinned state");
   }
   return data;
 }

@@ -102,7 +102,7 @@ export default function CurrentFolder() {
   };
 
   const convertShowTitle = (title: string) => {
-    if (title.length === 0) return "None";
+    if (!title) return "None";
     return title.length > 10 ? title.slice(0, 10) + "..." : title;
   };
 

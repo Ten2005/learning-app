@@ -10,6 +10,8 @@ import {
 import { ModeToggle } from "../modeToggle";
 import { readConversationsAction } from "@/app/(main)/search/actions";
 import ConversationItem from "@/components/searchSidebar/conversationItem";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 export async function SearchSidebar() {
   const conversations = await readConversationsAction();
@@ -21,6 +23,13 @@ export async function SearchSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
+            <div className="flex flex-row items-center py-2">
+              <Button variant="secondary" size="sm" asChild>
+                <Link href="/dashboard" prefetch>
+                  dashboard
+                </Link>
+              </Button>
+            </div>
             <SidebarMenu>
               {conversations.map((conversation) => (
                 <ConversationItem

@@ -11,7 +11,6 @@ import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 export default function Dashboard() {
   const {
@@ -68,17 +67,10 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
-      <div className="flex flex-col justify-between py-1 px-2">
+      <div className="flex flex-col justify-between py-1 px-2 sticky top-0 bg-background z-10">
         <div className="flex flex-row justify-between border-b pb-1">
           {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
           {currentFolder && <PageButtons />}
-        </div>
-        <div className="flex flex-row justify-end items-center py-1">
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/search" prefetch>
-              search
-            </Link>
-          </Button>
         </div>
       </div>
       <Textarea

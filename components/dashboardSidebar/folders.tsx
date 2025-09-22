@@ -2,7 +2,7 @@
 
 import { UsedFolder, UsedFile } from "@/store/sidebar";
 import { Button } from "../ui/button";
-import { Folder, Pin, PinOff } from "lucide-react";
+import { Pin, PinOff } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,

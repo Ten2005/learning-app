@@ -10,17 +10,9 @@ interface DashboardState {
 
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-
-  autoSaveTimeout: NodeJS.Timeout | null;
-  setAutoSaveTimeout: (timeout: NodeJS.Timeout | null) => void;
-
-  getAutoSaveState: () => {
-    currentFile: UsedFile | undefined;
-    autoSaveTimeout: NodeJS.Timeout | null;
-  };
 }
 
-export const useDashboardStore = create<DashboardState>((set, get) => ({
+export const useDashboardStore = create<DashboardState>((set) => ({
   currentFile: undefined,
   setCurrentFile: (currentFile) => set({ currentFile }),
 
@@ -29,12 +21,4 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   isLoading: false,
   setIsLoading: (isLoading) => set({ isLoading }),
-
-  autoSaveTimeout: null,
-  setAutoSaveTimeout: (timeout) => set({ autoSaveTimeout: timeout }),
-
-  getAutoSaveState: () => {
-    const { currentFile, autoSaveTimeout } = get();
-    return { currentFile, autoSaveTimeout };
-  },
 }));

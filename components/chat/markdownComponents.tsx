@@ -44,8 +44,13 @@ export const markdownComponents: Components = {
     <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>
   ),
   li: ({ children }) => <li>{children}</li>,
+  pre: ({ children }) => (
+    <pre className="bg-muted rounded px-[0.3rem] py-[0.2rem] font-mono text-sm overflow-x-auto whitespace-pre w-full min-w-0">
+      {children}
+    </pre>
+  ),
   code: ({ children }) => (
-    <code className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm">
+    <code className="bg-muted rounded px-[0.3rem] py-[0.2rem] font-mono text-sm">
       {children}
     </code>
   ),

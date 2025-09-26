@@ -15,14 +15,12 @@ export function Message({
   isUser: boolean;
 }) {
   return (
-    <div
-      className={cn("flex flex-row gap-2 items-end my-4", !isUser && "w-full")}
-    >
+    <div className={cn("flex flex-row items-end my-4")}>
       <div
         className={cn(
-          "flex flex-col gap-2 text-sm",
+          "flex flex-col gap-2 text-sm min-w-0",
           isUser &&
-            "rounded-lg px-3 py-2 bg-primary text-primary-foreground ml-auto w-max max-w-[75%]",
+            "rounded-lg px-3 py-2 bg-primary text-primary-foreground ml-auto max-w-[75%] break-words",
         )}
       >
         {parts.map((part: UIMessage["parts"][number], i: number) => {

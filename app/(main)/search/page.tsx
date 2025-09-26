@@ -21,7 +21,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 import type { DbMessage } from "@/lib/db/chat";
 import { chatOptions } from "@/store/chat";
 import { ChatType } from "@/store/chat";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type TextPart = Extract<UIMessage["parts"][number], { type: "text" }>;
 function isTextPart(part: UIMessage["parts"][number]): part is TextPart {
@@ -99,7 +98,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] max-h-[100dvh]">
+    <div className="flex flex-col h-[100dvh]">
       <div className="flex flex-col gap-1 py-2 px-4 sticky top-0 bg-background z-10">
         <div className="flex w-full justify-between items-center">
           <Button
@@ -127,7 +126,7 @@ export default function SearchPage() {
           </Select>
         </div>
       </div>
-      <ScrollArea className="p-2 h-[100dvh]">
+      <div className="p-2 h-[100dvh] overflow-y-auto">
         {messages.map((message) => (
           <Message
             key={message.id}
@@ -135,8 +134,7 @@ export default function SearchPage() {
             isUser={message.role === "user"}
           />
         ))}
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+      </div>
       <div className="flex w-full items-center gap-2 px-4 py-2 sticky bottom-0 bg-background">
         <form
           onSubmit={async (e) => {

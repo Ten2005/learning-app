@@ -12,7 +12,7 @@ function HighlightText({ text }: { text: string }) {
 
     if (selectableIndices.length === 0) return new Set<number>();
 
-    const targetCount = Math.max(1, Math.floor(selectableIndices.length / 2));
+    const targetCount = Math.max(1, Math.floor(selectableIndices.length / 1));
     const indices = new Set<number>();
     while (
       indices.size < targetCount &&

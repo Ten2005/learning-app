@@ -49,6 +49,19 @@ export async function updateFolder(id: number, name: string) {
 export async function deleteFolder(id: number) {
   const supabase = await createClient();
   const user = await getUser();
+
+  const { error: filesError } = await supabase
+    .from("file")
+    .update({ is_deleted: true })
+    .eq("parent_id", id)
+    .eq("user_id", user.id)
+    .eq("is_deleted", false);
+
+  if (filesError) {
+    console.error(filesError);
+    throw new Error("Failed to delete files in folder");
+  }
+
   const { data, error } = await supabase
     .from("folder")
     .update({ is_deleted: true })

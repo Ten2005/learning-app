@@ -94,12 +94,17 @@ function EditTitle() {
   const handleUpdateTitle = useCallback(async () => {
     setIsEditingTitle(false);
     if (currentFile) {
-      await updateFileAction(
-        currentFile.id,
-        currentFile.title || "",
-        currentFile.content || "",
-      );
       updateFileTitle(currentFile.id, currentFile.title || "");
+
+      try {
+        await updateFileAction(
+          currentFile.id,
+          currentFile.title || "",
+          currentFile.content || "",
+        );
+      } catch (error) {
+        console.error("Failed to update title:", error);
+      }
     }
   }, [currentFile, setIsEditingTitle, updateFileTitle]);
 

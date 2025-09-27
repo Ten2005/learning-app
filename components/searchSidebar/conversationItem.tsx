@@ -4,6 +4,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuAction,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import DeleteConfirmationDialog from "@/components/dashboardSidebar/deleteConfirmationDialog";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,9 +21,15 @@ export default function ConversationItem({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setCurrentConversationId, currentConversationId } = useChatStore();
+  const { isMobile, setOpenMobile } = useSidebar();
+
   const handleOpen = () => {
     setCurrentConversationId(id);
     router.push(`/search?c=${id}`);
+
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   const handleDelete = async () => {

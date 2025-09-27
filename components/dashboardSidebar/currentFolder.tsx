@@ -30,13 +30,24 @@ import { Input } from "../ui/input";
 import { UsedFolder } from "@/store/sidebar";
 import DeleteConfirmationDialog from "./deleteConfirmationDialog";
 import CreatePageButton from "./createPageButton";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import HighlightText from "@/utils/highlightText";
 
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
   const { currentFile, setCurrentFile } = useDashboardStore();
   const dragIndexRef = useRef<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(
+    null,
+  );
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const handleDragStart = (index: number) => (e: React.DragEvent) => {
     dragIndexRef.current = index;
@@ -53,9 +64,15 @@ export default function CurrentFolder() {
     const fromIndex = dragIndexRef.current;
     dragIndexRef.current = null;
     if (fromIndex === null || fromIndex === dropIndex) return;
+    await reorderItems(fromIndex, dropIndex);
+  };
+
+  const reorderItems = async (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+
     const newOrder = [...currentFiles];
     const [moved] = newOrder.splice(fromIndex, 1);
-    newOrder.splice(dropIndex, 0, moved);
+    newOrder.splice(toIndex, 0, moved);
 
     const renumbered = newOrder.map((f, i) => ({ ...f, page: i }));
     const orderedIds = renumbered.map((f) => f.id);
@@ -68,6 +85,73 @@ export default function CurrentFolder() {
     if (currentFolder) {
       await reorderFilesAction(currentFolder.id, orderedIds);
     }
+  };
+
+  const handleTouchStart = (index: number) => (e: React.TouchEvent) => {
+    if (!isTouchDevice) return;
+
+    const touch = e.touches[0];
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now(),
+    };
+
+    longPressTimerRef.current = setTimeout(() => {
+      setIsDragging(true);
+      setDraggedIndex(index);
+      dragIndexRef.current = index;
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }, 500);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isTouchDevice || !isDragging) return;
+
+    e.preventDefault();
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const fileItem = element?.closest("[data-file-index]");
+
+    if (fileItem) {
+      const targetIndex = parseInt(
+        fileItem.getAttribute("data-file-index") || "0",
+      );
+      if (targetIndex !== draggedIndex && dragIndexRef.current !== null) {
+        setDraggedIndex(targetIndex);
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (!isTouchDevice) return;
+
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+
+    if (isDragging && dragIndexRef.current !== null && draggedIndex !== null) {
+      await reorderItems(dragIndexRef.current, draggedIndex);
+    }
+
+    setIsDragging(false);
+    setDraggedIndex(null);
+    dragIndexRef.current = null;
+    touchStartRef.current = null;
+  };
+
+  const handleTouchCancel = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    setIsDragging(false);
+    setDraggedIndex(null);
+    dragIndexRef.current = null;
+    touchStartRef.current = null;
   };
 
   const handleDeleteFile = async (fileId: number) => {
@@ -135,16 +219,36 @@ export default function CurrentFolder() {
                 <SidebarMenuButton
                   key={file.id}
                   onClick={() => {
-                    setCurrentFile(file);
+                    if (!isDragging) {
+                      setCurrentFile(file);
+                    }
                   }}
                   asChild
                 >
                   <div
-                    className="flex items-center justify-between w-full"
-                    draggable
-                    onDragStart={handleDragStart(index)}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop(index)}
+                    className={`flex items-center justify-between w-full transition-all duration-200 ${
+                      isDragging && draggedIndex === index
+                        ? "bg-primary/10 shadow-sm"
+                        : isDragging && index === dragIndexRef.current
+                          ? "opacity-50"
+                          : ""
+                    }`}
+                    data-file-index={index}
+                    draggable={!isTouchDevice}
+                    onDragStart={
+                      !isTouchDevice ? handleDragStart(index) : undefined
+                    }
+                    onDragOver={!isTouchDevice ? handleDragOver : undefined}
+                    onDrop={!isTouchDevice ? handleDrop(index) : undefined}
+                    onTouchStart={
+                      isTouchDevice ? handleTouchStart(index) : undefined
+                    }
+                    onTouchMove={isTouchDevice ? handleTouchMove : undefined}
+                    onTouchEnd={isTouchDevice ? handleTouchEnd : undefined}
+                    onTouchCancel={
+                      isTouchDevice ? handleTouchCancel : undefined
+                    }
+                    style={{ touchAction: isDragging ? "none" : "auto" }}
                   >
                     <span>
                       {currentFile?.id === file.id ? (

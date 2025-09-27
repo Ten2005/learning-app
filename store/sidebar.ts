@@ -42,6 +42,12 @@ interface SidebarState {
   isCreatingFolder: boolean;
   setIsCreatingFolder: (isCreatingFolder: boolean) => void;
   getFilesByFolder: (folderId: number) => UsedFile[];
+
+  // Pin state management
+  pinningFolders: Set<number>;
+  setPinningFolder: (folderId: number, isPinning: boolean) => void;
+  toggleFolderPin: (folderId: number) => void;
+  revertFolderPin: (folderId: number) => void;
 }
 
 export const useSidebarStore = create<SidebarState>((set, get) => ({
@@ -125,4 +131,75 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
     const { filesCache } = get();
     return filesCache[folderId] || [];
   },
+
+  pinningFolders: new Set<number>(),
+
+  setPinningFolder: (folderId: number, isPinning: boolean) =>
+    set((state) => {
+      const newPinningFolders = new Set(state.pinningFolders);
+      if (isPinning) {
+        newPinningFolders.add(folderId);
+      } else {
+        newPinningFolders.delete(folderId);
+      }
+      return { pinningFolders: newPinningFolders };
+    }),
+
+  toggleFolderPin: (folderId: number) =>
+    set((state) => {
+      const updatedFolders = state.folders.map((folder) =>
+        folder.id === folderId
+          ? { ...folder, is_pinned: !folder.is_pinned }
+          : folder,
+      );
+
+      const sortedFolders = updatedFolders.sort((a, b) => {
+        const ap = a.is_pinned ? 1 : 0;
+        const bp = b.is_pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        return a.name.localeCompare(b.name);
+      });
+
+      const updatedCurrentFolder =
+        state.currentFolder?.id === folderId
+          ? {
+              ...state.currentFolder,
+              is_pinned: !state.currentFolder.is_pinned,
+            }
+          : state.currentFolder;
+
+      return {
+        folders: sortedFolders,
+        currentFolder: updatedCurrentFolder,
+      };
+    }),
+
+  revertFolderPin: (folderId: number) =>
+    set((state) => {
+      const updatedFolders = state.folders.map((folder) =>
+        folder.id === folderId
+          ? { ...folder, is_pinned: !folder.is_pinned }
+          : folder,
+      );
+
+      const sortedFolders = updatedFolders.sort((a, b) => {
+        const ap = a.is_pinned ? 1 : 0;
+        const bp = b.is_pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        return a.name.localeCompare(b.name);
+      });
+
+      const updatedCurrentFolder =
+        state.currentFolder?.id === folderId
+          ? {
+              ...state.currentFolder,
+              is_pinned: !state.currentFolder.is_pinned,
+            }
+          : state.currentFolder;
+
+      return {
+        folders: sortedFolders,
+        currentFolder: updatedCurrentFolder,
+      };
+    }),
 }));

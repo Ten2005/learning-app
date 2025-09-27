@@ -2,38 +2,93 @@
 
 import { UsedFolder, UsedFile } from "@/store/sidebar";
 import { Button } from "../ui/button";
-import { Pin, PinOff } from "lucide-react";
+import { Pin, PinOff, Loader2 } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  useSidebar,
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
 import { createFileAction } from "@/app/(main)/dashboard/actions";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { toggleFolderPinnedAction } from "@/app/(main)/dashboard/actions";
-import { useRouter } from "next/navigation";
 import HighlightText from "@/utils/highlightText";
 
 type FolderWithFiles = UsedFolder & { files: UsedFile[] };
 
-export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
+export default function Folders({
+  folders: initialFolders,
+}: {
+  folders: FolderWithFiles[];
+}) {
   const {
     currentFolder,
     setCurrentFolder,
     setCurrentFiles,
     getFilesByFolder,
     cacheFiles,
+    pinningFolders,
+    setPinningFolder,
+    toggleFolderPin,
+    revertFolderPin,
+    setFolders,
+    folders,
   } = useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
-  const router = useRouter();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const debounceTimers = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
   useEffect(() => {
-    folders.forEach((folder) => {
+    setFolders(initialFolders);
+
+    initialFolders.forEach((folder) => {
       cacheFiles(folder.id, folder.files);
     });
-  }, [folders, cacheFiles]);
+  }, [initialFolders, cacheFiles, setFolders]);
+
+  useEffect(() => {
+    const timers = debounceTimers.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
+
+  const handlePinToggle = useCallback(
+    async (folderId: number, currentPinState: boolean) => {
+      if (pinningFolders.has(folderId)) {
+        return;
+      }
+
+      const existingTimer = debounceTimers.current.get(folderId);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      setPinningFolder(folderId, true);
+
+      toggleFolderPin(folderId);
+
+      const timer = setTimeout(async () => {
+        try {
+          await toggleFolderPinnedAction(folderId, !currentPinState);
+        } catch (error) {
+          console.error("Failed to toggle pin state:", error);
+
+          revertFolderPin(folderId);
+        } finally {
+          setPinningFolder(folderId, false);
+          debounceTimers.current.delete(folderId);
+        }
+      }, 300);
+
+      debounceTimers.current.set(folderId, timer);
+    },
+    [pinningFolders, setPinningFolder, toggleFolderPin, revertFolderPin],
+  );
 
   const changeFolder = useCallback(
     async (folder: UsedFolder) => {
@@ -44,10 +99,21 @@ export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
         setCurrentFiles(files);
         setCurrentFile(files[0]);
       } else {
-        const file = await createFileAction(folder.id, 0);
-        cacheFiles(folder.id, [file]);
-        setCurrentFiles([file]);
-        setCurrentFile(file);
+        setCurrentFiles([]);
+        setCurrentFile(undefined);
+
+        try {
+          const file = await createFileAction(folder.id, 0);
+          cacheFiles(folder.id, [file]);
+          setCurrentFiles([file]);
+          setCurrentFile(file);
+        } catch (error) {
+          console.error("Failed to create file:", error);
+        }
+      }
+
+      if (isMobile) {
+        setOpenMobile(false);
       }
     },
     [
@@ -56,6 +122,8 @@ export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
       setCurrentFiles,
       setCurrentFile,
       cacheFiles,
+      isMobile,
+      setOpenMobile,
     ],
   );
 
@@ -81,18 +149,17 @@ export default function Folders({ folders }: { folders: FolderWithFiles[] }) {
                   size="icon"
                   variant="ghost"
                   className="p-1"
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.stopPropagation();
-                    await toggleFolderPinnedAction(
-                      folder.id,
-                      !folder.is_pinned,
-                    );
-                    router.refresh();
+                    handlePinToggle(folder.id, folder.is_pinned);
                   }}
+                  disabled={pinningFolders.has(folder.id)}
                   aria-label={folder.is_pinned ? "Unpin folder" : "Pin folder"}
                   title={folder.is_pinned ? "Unpin" : "Pin"}
                 >
-                  {folder.is_pinned ? (
+                  {pinningFolders.has(folder.id) ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : folder.is_pinned ? (
                     <Pin className="text-primary" />
                   ) : (
                     <PinOff className="text-muted" />

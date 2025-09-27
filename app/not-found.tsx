@@ -1,4 +1,8 @@
+"use client";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Error() {
   return (
@@ -6,24 +10,16 @@ export default function Error() {
       <div>
         <Alert variant="default" className="w-full max-w-md">
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
+          <AlertDescription className="flex flex-col gap-2">
             Something went wrong. Please try again.
+            <div className="flex justify-end w-full">
+              <Button size="sm" asChild>
+                <Link href="/dashboard">Back to Top</Link>
+              </Button>
+            </div>
           </AlertDescription>
         </Alert>
-        <LinkAsButton />
       </div>
     </div>
-  );
-}
-
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-
-export function LinkAsButton() {
-  return (
-    <Button asChild variant={"link"}>
-      <Link href="/">Top Page</Link>
-    </Button>
   );
 }

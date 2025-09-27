@@ -11,8 +11,6 @@ import { readFoldersAction } from "@/app/(main)/dashboard/actions";
 import Folders from "@/components/dashboardSidebar/folders";
 import CurrentFolder from "@/components/dashboardSidebar/currentFolder";
 import { ModeToggle } from "../modeToggle";
-import { Button } from "../ui/button";
-import Link from "next/link";
 
 export async function DashboardSidebar() {
   const folders = await readFoldersAction();
@@ -22,15 +20,7 @@ export async function DashboardSidebar() {
         <ModeToggle />
       </SidebarHeader>
       <SidebarContent>
-        <div className="flex flex-row px-2 items-center">
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/search" prefetch>
-              search
-            </Link>
-          </Button>
-        </div>
         <Folders folders={folders} />
-        <CurrentFolder />
         <SidebarGroup>
           <SidebarGroupContent>
             <div className="flex justify-end">
@@ -38,6 +28,7 @@ export async function DashboardSidebar() {
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+        <CurrentFolder />
       </SidebarContent>
     </Sidebar>
   );

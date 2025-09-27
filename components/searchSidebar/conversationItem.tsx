@@ -10,6 +10,7 @@ import DeleteConfirmationDialog from "@/components/dashboardSidebar/deleteConfir
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteConversationAction } from "@/app/(main)/search/actions";
 import { useChatStore } from "@/store/chat";
+import { useRef } from "react";
 
 export default function ConversationItem({
   id,
@@ -22,12 +23,13 @@ export default function ConversationItem({
   const searchParams = useSearchParams();
   const { setCurrentConversationId, currentConversationId } = useChatStore();
   const { isMobile, setOpenMobile } = useSidebar();
+  const deleteDialogOpenRef = useRef(false);
 
   const handleOpen = () => {
     setCurrentConversationId(id);
     router.push(`/search?c=${id}`);
 
-    if (isMobile) {
+    if (isMobile && !deleteDialogOpenRef.current) {
       setOpenMobile(false);
     }
   };
@@ -54,6 +56,12 @@ export default function ConversationItem({
             <DeleteConfirmationDialog
               deleteFunction={handleDelete}
               target={title || "Conversation"}
+              onBeforeOpen={() => {
+                deleteDialogOpenRef.current = true;
+              }}
+              onOpenChange={(open) => {
+                deleteDialogOpenRef.current = open;
+              }}
             />
           </SidebarMenuAction>
         </div>

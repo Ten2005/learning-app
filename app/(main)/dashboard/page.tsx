@@ -76,8 +76,8 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
-      <div className="flex flex-col justify-between py-1 px-2 sticky top-0 bg-background z-10">
-        <div className="flex flex-row justify-between border-b pb-1">
+      <div className="flex flex-col justify-between py-1 px-2 sticky top-0 bg-background z-5">
+        <div className="flex flex-row justify-between pb-1">
           {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
           {currentFolder && <PageButtons />}
         </div>

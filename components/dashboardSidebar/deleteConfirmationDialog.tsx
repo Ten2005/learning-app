@@ -16,9 +16,13 @@ import { useState } from "react";
 export default function DeleteConfirmationDialog({
   deleteFunction,
   target,
+  onOpenChange,
+  onBeforeOpen,
 }: {
   deleteFunction: () => Promise<void>;
   target: string;
+  onOpenChange?: (open: boolean) => void;
+  onBeforeOpen?: () => void;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -27,14 +31,19 @@ export default function DeleteConfirmationDialog({
     await deleteFunction();
     setIsDeleting(false);
   };
+
+  const handleTriggerClick = () => {
+    onBeforeOpen?.();
+  };
   return (
-    <AlertDialog>
+    <AlertDialog onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
           className="text-destructive"
           disabled={isDeleting}
+          onClick={handleTriggerClick}
         >
           {isDeleting ? (
             <Loader2Icon className="w-4 h-4 animate-spin" />

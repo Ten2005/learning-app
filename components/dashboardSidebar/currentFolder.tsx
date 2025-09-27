@@ -6,6 +6,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenuButton,
+  useSidebar,
 } from "../ui/sidebar";
 import {
   Accordion,
@@ -36,6 +37,7 @@ import HighlightText from "@/utils/highlightText";
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
   const { currentFile, setCurrentFile } = useDashboardStore();
+  const { isMobile, setOpenMobile } = useSidebar();
   const dragIndexRef = useRef<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -221,6 +223,10 @@ export default function CurrentFolder() {
                   onClick={() => {
                     if (!isDragging) {
                       setCurrentFile(file);
+                      // Close sidebar on mobile when file is selected
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      }
                     }
                   }}
                   asChild

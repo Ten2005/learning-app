@@ -9,8 +9,9 @@ import PageButtons from "@/components/dashboard/pageButton";
 import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function Dashboard() {
   const {
@@ -21,6 +22,14 @@ export default function Dashboard() {
     setAutoSaveTimeout,
   } = useDashboardStore();
   const { currentFolder, updateFileContent } = useSidebarStore();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  // Open sidebar when no file is selected (mobile)
+  useEffect(() => {
+    if (isMobile && !currentFile) {
+      setOpenMobile(true);
+    }
+  }, [currentFile, isMobile, setOpenMobile]);
 
   const autoSaveHandler = useCallback(
     async (fileId: number, title: string, content: string) => {

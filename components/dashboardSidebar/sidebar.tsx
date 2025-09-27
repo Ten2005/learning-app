@@ -29,8 +29,8 @@ export async function DashboardSidebar() {
             </Link>
           </Button>
         </div>
-        <CurrentFolder />
         <Folders folders={folders} />
+        <CurrentFolder />
         <SidebarGroup>
           <SidebarGroupContent>
             <div className="flex justify-end">

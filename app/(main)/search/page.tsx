@@ -46,6 +46,7 @@ export default function SearchPage() {
     [chatType],
   );
   const { messages, setMessages, sendMessage, status } = useChat({
+    id: chatType,
     transport,
     onFinish: async ({ message }) => {
       try {

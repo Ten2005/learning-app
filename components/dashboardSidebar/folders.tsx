@@ -7,7 +7,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  useSidebar,
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
@@ -37,7 +36,6 @@ export default function Folders({
     folders,
   } = useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
-  const { isMobile, setOpenMobile } = useSidebar();
 
   const debounceTimers = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
@@ -97,7 +95,6 @@ export default function Folders({
       const files = getFilesByFolder(folder.id);
       if (files.length > 0) {
         setCurrentFiles(files);
-        setCurrentFile(files[0]);
       } else {
         setCurrentFiles([]);
         setCurrentFile(undefined);
@@ -106,14 +103,9 @@ export default function Folders({
           const file = await createFileAction(folder.id, 0);
           cacheFiles(folder.id, [file]);
           setCurrentFiles([file]);
-          setCurrentFile(file);
         } catch (error) {
           console.error("Failed to create file:", error);
         }
-      }
-
-      if (isMobile) {
-        setOpenMobile(false);
       }
     },
     [
@@ -122,8 +114,6 @@ export default function Folders({
       setCurrentFiles,
       setCurrentFile,
       cacheFiles,
-      isMobile,
-      setOpenMobile,
     ],
   );
 

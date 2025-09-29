@@ -121,7 +121,7 @@ export default function Dashboard() {
       }
       const data: { text: string } = await result.json();
       const responseText = data.text ?? "";
-      const updatedSegment = `${startFrag}${query}\n${separator}\n${responseText}\n${endFrag}`;
+      const updatedSegment = `${startFrag}\n${query}\n${separator}\n${responseText}\n${endFrag}`;
       setPendingSegment({ query, replacement: updatedSegment });
       setArrowCount(newArrowCount);
       return updatedSegment;

@@ -7,13 +7,20 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarMenuAction,
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
-import { createFileAction } from "@/app/(main)/dashboard/actions";
+import {
+  createFileAction,
+  toggleFolderPinnedAction,
+  deleteFolderAction,
+  updateFolderAction,
+} from "@/app/(main)/dashboard/actions";
 import { useCallback, useEffect, useRef } from "react";
-import { toggleFolderPinnedAction } from "@/app/(main)/dashboard/actions";
-import HighlightText from "@/utils/highlightText";
+import { cn } from "@/lib/utils";
+import DeleteConfirmationDialog from "./deleteConfirmationDialog";
+import EditConfirmationDialog from "./editConfirmationDialog";
 
 type FolderWithFiles = UsedFolder & { files: UsedFile[] };
 
@@ -95,6 +102,7 @@ export default function Folders({
       const files = getFilesByFolder(folder.id);
       if (files.length > 0) {
         setCurrentFiles(files);
+        setCurrentFile(files[0]);
       } else {
         setCurrentFiles([]);
         setCurrentFile(undefined);
@@ -103,6 +111,7 @@ export default function Folders({
           const file = await createFileAction(folder.id, 0);
           cacheFiles(folder.id, [file]);
           setCurrentFiles([file]);
+          setCurrentFile(file);
         } catch (error) {
           console.error("Failed to create file:", error);
         }
@@ -117,16 +126,49 @@ export default function Folders({
     ],
   );
 
+  const handleDeleteFolder = async (folderId: number) => {
+    await deleteFolderAction(folderId);
+
+    const updatedFolders = folders.filter((folder) => folder.id !== folderId);
+    setFolders(updatedFolders);
+
+    if (currentFolder?.id === folderId) {
+      if (updatedFolders.length > 0) {
+        await changeFolder(updatedFolders[0]);
+      } else {
+        setCurrentFolder(undefined);
+        setCurrentFiles([]);
+        setCurrentFile(undefined);
+      }
+    }
+  };
+
+  const handleEditFolder = async (folderId: number, newName: string) => {
+    await updateFolderAction(folderId, newName);
+
+    const updatedFolders = folders.map((folder) =>
+      folder.id === folderId ? { ...folder, name: newName } : folder,
+    );
+    setFolders(updatedFolders);
+
+    if (currentFolder?.id === folderId) {
+      setCurrentFolder({ ...currentFolder, name: newName });
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Folders</SidebarGroupLabel>
-      <SidebarGroupContent className="flex flex-col gap-2">
+      <SidebarGroupContent className="flex flex-col gap-1">
         {folders.map((folder) => (
           <Button
             key={folder.id}
             variant="ghost"
             size="sm"
-            className="p-0 justify-start w-full"
+            className={cn(
+              "p-0 justify-between w-full",
+              currentFolder?.id === folder.id && "bg-accent",
+            )}
             onClick={() => changeFolder(folder)}
             asChild
           >
@@ -155,12 +197,38 @@ export default function Folders({
                     <PinOff className="text-muted" />
                   )}
                 </Button>
-                {currentFolder?.id === folder.id ? (
-                  <HighlightText text={folder.name} />
-                ) : (
-                  folder.name
-                )}
+                <span className="max-w-24 truncate">{folder.name}</span>
               </div>
+              {currentFolder?.id === folder.id && (
+                <div>
+                  <SidebarMenuAction
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    asChild
+                    showOnHover
+                  >
+                    <EditConfirmationDialog
+                      editFunction={(newName) =>
+                        handleEditFolder(folder.id, newName)
+                      }
+                      target={folder.name}
+                    />
+                  </SidebarMenuAction>
+                  <SidebarMenuAction
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    asChild
+                    showOnHover
+                  >
+                    <DeleteConfirmationDialog
+                      deleteFunction={() => handleDeleteFolder(folder.id)}
+                      target={folder.name}
+                    />
+                  </SidebarMenuAction>
+                </div>
+              )}
             </div>
           </Button>
         ))}

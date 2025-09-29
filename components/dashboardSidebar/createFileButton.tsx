@@ -6,7 +6,7 @@ import { Loader2Icon, PlusIcon } from "lucide-react";
 import { createFileAfterCurrentAction } from "@/app/(main)/dashboard/actions";
 import { useDashboardStore } from "@/store/dashboard";
 
-export default function CreatePageButton() {
+export default function CreateFileButton() {
   const { currentFolder, insertFileAfterCurrent } = useSidebarStore();
   const { currentFile, setCurrentFile, isLoading, setIsLoading } =
     useDashboardStore();
@@ -35,7 +35,7 @@ export default function CreatePageButton() {
       ) : (
         <PlusIcon />
       )}
-      New Page
+      New File
     </Button>
   );
 }

@@ -11,6 +11,7 @@ import { readFoldersAction } from "@/app/(main)/dashboard/actions";
 import Folders from "@/components/dashboardSidebar/folders";
 import CurrentFolder from "@/components/dashboardSidebar/currentFolder";
 import { ModeToggle } from "../modeToggle";
+import CreateFileButton from "./createFileButton";
 
 export async function DashboardSidebar() {
   const folders = await readFoldersAction();
@@ -29,6 +30,13 @@ export async function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <CurrentFolder />
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <div className="flex justify-end">
+              <CreateFileButton />
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );

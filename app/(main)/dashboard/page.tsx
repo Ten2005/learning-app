@@ -3,10 +3,7 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
-import { CheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import PageButtons from "@/components/dashboard/pageButton";
-import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -19,13 +16,8 @@ type PendingSegment = {
 };
 
 export default function Dashboard() {
-  const {
-    currentFile,
-    setCurrentFile,
-    isEditingTitle,
-    autoSaveTimeout,
-    setAutoSaveTimeout,
-  } = useDashboardStore();
+  const { currentFile, setCurrentFile, autoSaveTimeout, setAutoSaveTimeout } =
+    useDashboardStore();
   const { currentFolder, updateFileContent } = useSidebarStore();
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -202,7 +194,7 @@ export default function Dashboard() {
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
       <div className="flex flex-col justify-between py-1 px-2 sticky top-0 bg-background z-5">
         <div className="flex flex-row justify-between pb-1">
-          {currentFile && (isEditingTitle ? <EditTitle /> : <ShowTitle />)}
+          <ShowTitle />
           {currentFolder && <PageButtons />}
         </div>
       </div>
@@ -218,70 +210,21 @@ export default function Dashboard() {
   );
 }
 
-function EditTitle() {
-  const { currentFile, setCurrentFile, setIsEditingTitle } =
-    useDashboardStore();
-
-  const { updateFileTitle } = useSidebarStore();
-
-  const handleUpdateTitle = useCallback(async () => {
-    setIsEditingTitle(false);
-    if (currentFile) {
-      updateFileTitle(currentFile.id, currentFile.title || "");
-
-      try {
-        await updateFileAction(
-          currentFile.id,
-          currentFile.title || "",
-          currentFile.content || "",
-        );
-      } catch (error) {
-        console.error("Failed to update title:", error);
-      }
-    }
-  }, [currentFile, setIsEditingTitle, updateFileTitle]);
-
-  return (
-    <div className="flex flex-row items-center gap-1">
-      <Input
-        type="text"
-        value={currentFile?.title || ""}
-        onChange={(e) => {
-          if (currentFile) {
-            setCurrentFile({ ...currentFile, title: e.target.value });
-          }
-        }}
-      />
-      <Button variant="ghost" size="icon" onClick={handleUpdateTitle}>
-        <CheckIcon className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-}
-
 function ShowTitle() {
   const { currentFile } = useDashboardStore();
   const { currentFolder } = useSidebarStore();
-  const { setIsEditingTitle } = useDashboardStore();
   return (
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row items-center max-w-full truncate overflow-x-auto scrollbar-hide">
       <span className="text-xs text-muted-foreground px-1">
         {currentFolder?.name} -&gt; {currentFile?.page} :
       </span>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setIsEditingTitle(true)}
-        asChild
+      <Label
+        className={cn(
+          currentFile?.title ? "text-primary" : "text-muted-foreground",
+        )}
       >
-        <Label
-          className={cn(
-            currentFile?.title ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {currentFile?.title ? currentFile.title : "None"}
-        </Label>
-      </Button>
+        {currentFile?.title ? currentFile.title : "None"}
+      </Label>
     </div>
   );
 }

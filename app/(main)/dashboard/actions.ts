@@ -174,3 +174,19 @@ export async function reorderFilesAction(
     throw new Error("Failed to reorder files");
   }
 }
+
+export async function editFileAction(
+  id: number,
+  title: string,
+  content: string,
+) {
+  try {
+    const file = await updateFile(id, title, content);
+    revalidatePath("/dashboard");
+    revalidateTag("files");
+    return file;
+  } catch (error) {
+    console.error("Error editing file:", error);
+    throw new Error("Failed to edit file");
+  }
+}

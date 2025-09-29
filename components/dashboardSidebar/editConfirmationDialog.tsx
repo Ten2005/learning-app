@@ -10,64 +10,83 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, Trash2Icon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2Icon, Edit2Icon } from "lucide-react";
 import { useState } from "react";
 
-export default function DeleteConfirmationDialog({
-  deleteFunction,
+export default function EditConfirmationDialog({
+  editFunction,
   target,
   onOpenChange,
   onBeforeOpen,
 }: {
-  deleteFunction: () => Promise<void>;
+  editFunction: (newTitle: string) => Promise<void>;
   target: string;
   onOpenChange?: (open: boolean) => void;
   onBeforeOpen?: () => void;
 }) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTitle, setNewTitle] = useState(target);
+  const [open, setOpen] = useState(false);
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    await deleteFunction();
-    setIsDeleting(false);
+  const handleEdit = async () => {
+    setIsEditing(true);
+    await editFunction(newTitle);
+    setIsEditing(false);
+    setOpen(false);
   };
 
   const handleTriggerClick = () => {
+    setNewTitle(target);
     onBeforeOpen?.();
   };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    onOpenChange?.(isOpen);
+  };
+
   return (
-    <AlertDialog onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="text-destructive"
-          disabled={isDeleting}
+          disabled={isEditing}
           onClick={handleTriggerClick}
         >
-          {isDeleting ? (
+          {isEditing ? (
             <Loader2Icon className="w-4 h-4 animate-spin" />
           ) : (
-            <Trash2Icon className="w-4 h-4" />
+            <Edit2Icon className="w-4 h-4" />
           )}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader className="overflow-x-auto scrollbar-hide">
           <AlertDialogTitle className="overflow-x-auto scrollbar-hide whitespace-nowrap">
-            Delete <span className="text-primary">{target}</span>
+            Edit <span className="text-primary">{target}</span>
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone.
+            This action will overwrite the current content.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        <div className="grid gap-4">
+          <div className="grid gap-3">
+            <Input
+              id="title-input"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+          </div>
+        </div>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? (
+          <AlertDialogAction onClick={handleEdit} disabled={isEditing}>
+            {isEditing ? (
               <Loader2Icon className="w-4 h-4 animate-spin" />
             ) : (
-              "Delete"
+              "Edit"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

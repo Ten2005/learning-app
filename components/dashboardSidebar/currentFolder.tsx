@@ -8,31 +8,18 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from "../ui/sidebar";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
-import { CheckIcon, Folder, PencilIcon } from "lucide-react";
-import { Button } from "../ui/button";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
-import { useRouter } from "next/navigation";
 import {
-  deleteFolderAction,
   deleteFileAction,
-  updateFolderAction,
   createFileAction,
-  readFoldersAction,
   reorderFilesAction,
+  editFileAction,
 } from "@/app/(main)/dashboard/actions";
-import { Input } from "../ui/input";
-import { UsedFolder } from "@/store/sidebar";
 import DeleteConfirmationDialog from "./deleteConfirmationDialog";
-import CreatePageButton from "./createPageButton";
 import { useRef, useState, useEffect } from "react";
-import HighlightText from "@/utils/highlightText";
+import { cn } from "@/lib/utils";
+import EditConfirmationDialog from "./editConfirmationDialog";
 
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();
@@ -157,7 +144,7 @@ export default function CurrentFolder() {
   };
 
   const handleDeleteFile = async (fileId: number) => {
-    if (!currentFolder) return;
+    if (!currentFolder || !currentFolder.id) return;
 
     const fileToDelete = currentFiles.find((file) => file.id === fileId);
     if (!fileToDelete) return;
@@ -174,7 +161,7 @@ export default function CurrentFolder() {
 
     setCurrentFiles(filteredFiles);
 
-    if (filteredFiles.length === 0 && currentFolder) {
+    if (filteredFiles.length === 0 && currentFolder && currentFolder.id) {
       const file = await createFileAction(currentFolder.id, 0);
       setCurrentFiles([file]);
       setCurrentFile(file);
@@ -187,12 +174,23 @@ export default function CurrentFolder() {
     }
   };
 
-  const convertShowTitle = (title: string) => {
-    if (!title) return "None";
-    return title.length > 10 ? title.slice(0, 10) + "..." : title;
+  const handleEditFile = async (fileId: number, newTitle: string) => {
+    if (!currentFolder || !currentFolder.id) return;
+    const fileToEdit = currentFiles.find((file) => file.id === fileId);
+    if (!fileToEdit) return;
+    await editFileAction(fileId, newTitle, fileToEdit.content || "");
+
+    const updatedFiles = currentFiles.map((file) =>
+      file.id === fileId ? { ...file, title: newTitle } : file,
+    );
+    setCurrentFiles(updatedFiles);
+
+    if (currentFile?.id === fileId) {
+      setCurrentFile({ ...currentFile, title: newTitle });
+    }
   };
 
-  if (!currentFolder)
+  if (!currentFolder || !currentFolder.id)
     return (
       <SidebarGroup>
         <SidebarGroupLabel>Current Folder</SidebarGroupLabel>
@@ -205,155 +203,80 @@ export default function CurrentFolder() {
     );
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Current Folder</SidebarGroupLabel>
-      <SidebarGroupContent>
-        <EditFolder currentFolder={currentFolder} />
-        <Accordion type="single" defaultValue="item-1" collapsible>
-          <AccordionItem value="item-1">
-            <AccordionTrigger>
-              <div className="flex items-center justify-start w-full">
-                <Folder className="w-4 h-4 mr-2" />
-                {currentFolder.name}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              {currentFiles.map((file, index) => (
-                <SidebarMenuButton
-                  key={file.id}
-                  onClick={() => {
-                    if (!isDragging) {
-                      setCurrentFile(file);
-                      // Close sidebar on mobile when file is selected
-                      if (isMobile) {
-                        setOpenMobile(false);
-                      }
-                    }
-                  }}
-                  asChild
-                >
-                  <div
-                    className={`flex items-center justify-between w-full transition-all duration-200 ${
-                      isDragging && draggedIndex === index
-                        ? "bg-primary/10 shadow-sm"
-                        : isDragging && index === dragIndexRef.current
-                          ? "opacity-50"
-                          : ""
-                    }`}
-                    data-file-index={index}
-                    draggable={!isTouchDevice}
-                    onDragStart={
-                      !isTouchDevice ? handleDragStart(index) : undefined
-                    }
-                    onDragOver={!isTouchDevice ? handleDragOver : undefined}
-                    onDrop={!isTouchDevice ? handleDrop(index) : undefined}
-                    onTouchStart={
-                      isTouchDevice ? handleTouchStart(index) : undefined
-                    }
-                    onTouchMove={isTouchDevice ? handleTouchMove : undefined}
-                    onTouchEnd={isTouchDevice ? handleTouchEnd : undefined}
-                    onTouchCancel={
-                      isTouchDevice ? handleTouchCancel : undefined
-                    }
-                    style={{ touchAction: isDragging ? "none" : "auto" }}
+      <SidebarGroupLabel>
+        Files :{" "}
+        <span className="max-w-24 truncate">{currentFolder.name || ""}</span>
+      </SidebarGroupLabel>
+      <SidebarGroupContent className="flex flex-col gap-1">
+        {currentFiles.map((file, index) => (
+          <SidebarMenuButton
+            key={file.id}
+            onClick={() => {
+              if (!isDragging) {
+                setCurrentFile(file);
+                // Close sidebar on mobile when file is selected
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
+              }
+            }}
+            className={cn(currentFile?.id === file.id && "bg-accent")}
+            asChild
+          >
+            <div
+              className={`flex items-center justify-between w-full transition-all duration-200 ${
+                isDragging && draggedIndex === index
+                  ? "bg-primary/10 shadow-sm"
+                  : isDragging && index === dragIndexRef.current
+                    ? "opacity-50"
+                    : ""
+              }`}
+              data-file-index={index}
+              draggable={!isTouchDevice}
+              onDragStart={!isTouchDevice ? handleDragStart(index) : undefined}
+              onDragOver={!isTouchDevice ? handleDragOver : undefined}
+              onDrop={!isTouchDevice ? handleDrop(index) : undefined}
+              onTouchStart={isTouchDevice ? handleTouchStart(index) : undefined}
+              onTouchMove={isTouchDevice ? handleTouchMove : undefined}
+              onTouchEnd={isTouchDevice ? handleTouchEnd : undefined}
+              onTouchCancel={isTouchDevice ? handleTouchCancel : undefined}
+              style={{ touchAction: isDragging ? "none" : "auto" }}
+            >
+              <span className="max-w-24 truncate">{file.title}</span>
+              {currentFile?.id === file.id && (
+                <div>
+                  <SidebarMenuAction
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    asChild
+                    showOnHover
                   >
-                    <span>
-                      {currentFile?.id === file.id ? (
-                        <HighlightText text={convertShowTitle(file.title)} />
-                      ) : (
-                        convertShowTitle(file.title)
-                      )}
-                    </span>
-                    <SidebarMenuAction
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      asChild
-                      showOnHover
-                    >
-                      <DeleteConfirmationDialog
-                        deleteFunction={() => handleDeleteFile(file.id)}
-                        target={file.title || "None"}
-                      />
-                    </SidebarMenuAction>
-                  </div>
-                </SidebarMenuButton>
-              ))}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <div className="flex justify-end">
-          <CreatePageButton />
-        </div>
+                    <EditConfirmationDialog
+                      editFunction={(newTitle) =>
+                        handleEditFile(file.id, newTitle)
+                      }
+                      target={file.title || "None"}
+                    />
+                  </SidebarMenuAction>
+                  <SidebarMenuAction
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    asChild
+                    showOnHover
+                  >
+                    <DeleteConfirmationDialog
+                      deleteFunction={() => handleDeleteFile(file.id)}
+                      target={file.title || "None"}
+                    />
+                  </SidebarMenuAction>
+                </div>
+              )}
+            </div>
+          </SidebarMenuButton>
+        ))}
       </SidebarGroupContent>
     </SidebarGroup>
-  );
-}
-
-function EditFolder({ currentFolder }: { currentFolder: UsedFolder }) {
-  const {
-    isEditingFolder,
-    setIsEditingFolder,
-    setCurrentFolder,
-    setCurrentFiles,
-    cacheFiles,
-  } = useSidebarStore();
-  const { setCurrentFile } = useDashboardStore();
-  const router = useRouter();
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentFolder({ ...currentFolder, name: e.target.value });
-  };
-
-  const handleUpdateFolder = () => {
-    if (isEditingFolder) {
-      updateFolderAction(currentFolder.id, currentFolder.name);
-    }
-    setIsEditingFolder(!isEditingFolder);
-  };
-
-  const handleDeleteFolder = async () => {
-    await deleteFolderAction(currentFolder.id);
-
-    const folders = await readFoldersAction();
-    if (folders.length > 0) {
-      const first = folders[0];
-      setCurrentFolder(first);
-      cacheFiles(first.id, first.files);
-      setCurrentFiles(first.files);
-      setCurrentFile(first.files[0] ?? undefined);
-    } else {
-      setCurrentFolder(undefined);
-      setCurrentFiles([]);
-      setCurrentFile(undefined);
-    }
-
-    router.refresh();
-  };
-
-  return (
-    <div className="flex items-center justify-between w-full gap-4">
-      {isEditingFolder ? (
-        <Input
-          type="text"
-          value={currentFolder.name}
-          onChange={handleInputChange}
-        />
-      ) : (
-        <p>{currentFolder.name}</p>
-      )}
-      <div className="flex items-center">
-        <Button variant="ghost" size="icon" onClick={handleUpdateFolder}>
-          {isEditingFolder ? (
-            <CheckIcon className="w-4 h-4" />
-          ) : (
-            <PencilIcon className="w-4 h-4" />
-          )}
-        </Button>
-        <DeleteConfirmationDialog
-          deleteFunction={handleDeleteFolder}
-          target={currentFolder.name}
-        />
-      </div>
-    </div>
   );
 }

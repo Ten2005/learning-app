@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   try {
     const { text } = await generateText({
-      model: xai.chat("grok-code-fast-1"),
+      model: xai.chat("grok-4-fast-reasoning"),
       prompt,
       providerOptions: {
         xai: {

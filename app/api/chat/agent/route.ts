@@ -14,7 +14,16 @@ export async function POST(req: Request) {
     const { text } = await generateText({
       model: google.chat("gemini-2.5-flash-lite"),
       tools,
-      prompt,
+      messages: [
+        {
+          role: "system",
+          content: "Please provide concise answers.",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
     });
     const strippedText = await removeMarkdown(text);
     return NextResponse.json({ text: strippedText });

@@ -1,26 +1,23 @@
 import { NextResponse } from "next/server";
-import { xai } from "@ai-sdk/xai";
-import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
+import { generateText, ToolSet } from "ai";
+import { removeMarkdown } from "@/utils/removeMarkdown";
 
 export async function POST(req: Request) {
   const { prompt }: { prompt: string } = await req.json();
 
+  const tools = {
+    google_search: google.tools.googleSearch({}),
+  } as unknown as ToolSet;
+
   try {
     const { text } = await generateText({
-      model: xai.chat("grok-4-fast-reasoning"),
+      model: google.chat("gemini-2.5-flash-lite"),
+      tools,
       prompt,
-      providerOptions: {
-        xai: {
-          searchParameters: {
-            mode: "on", // 'auto', 'on', or 'off'
-            returnCitations: true,
-            maxSearchResults: 5,
-          },
-        },
-      },
     });
-
-    return NextResponse.json({ text });
+    const strippedText = await removeMarkdown(text);
+    return NextResponse.json({ text: strippedText });
   } catch (error) {
     console.error("agent route failed", error);
     return NextResponse.json({ error: "agent failed" }, { status: 500 });

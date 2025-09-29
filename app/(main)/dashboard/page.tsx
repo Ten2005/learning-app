@@ -9,9 +9,14 @@ import PageButtons from "@/components/dashboard/pageButton";
 import { Input } from "@/components/ui/input";
 import { useSidebarStore } from "@/store/sidebar";
 import { updateFileAction } from "./actions";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
+
+type PendingSegment = {
+  query: string;
+  replacement: string;
+};
 
 export default function Dashboard() {
   const {
@@ -31,9 +36,128 @@ export default function Dashboard() {
     }
   }, [currentFile, isMobile, setOpenMobile]);
 
+  const startFrag = "->";
+  const endFrag = "<-";
+  const separator = "--";
+  const [arrowCount, setArrowCount] = useState(0);
+  const initialized = useRef(false);
+  const [pendingSegment, setPendingSegment] = useState<PendingSegment | null>(
+    null,
+  );
+
+  const replacePendingSegment = useCallback(
+    (content: string, segment: PendingSegment): string | null => {
+      const startToken = `${startFrag}${segment.query}`;
+      const startIndex = content.indexOf(startToken);
+      if (startIndex === -1) {
+        return null;
+      }
+
+      const searchFrom = startIndex + startToken.length;
+      const endIndex = content.indexOf(endFrag, searchFrom);
+      if (endIndex === -1) {
+        return null;
+      }
+
+      const before = content.slice(0, startIndex);
+      const after = content.slice(endIndex + endFrag.length);
+      return `${before}${segment.replacement}${after}`;
+    },
+    [endFrag, startFrag],
+  );
+
+  const commandAgent = useCallback(async (): Promise<string | null> => {
+    if (!currentFile) return null;
+    const contentForScan = currentFile.content || "";
+    const newArrowCount = contentForScan.split(endFrag).length - 1;
+
+    if (!initialized.current) {
+      initialized.current = true;
+      setArrowCount(newArrowCount);
+      return null;
+    }
+
+    if (newArrowCount > arrowCount) {
+      const content = currentFile.content || "";
+      const arrowPositions = [];
+      let searchIndex = 0;
+
+      while (true) {
+        const arrowIndex = content.indexOf(endFrag, searchIndex);
+        if (arrowIndex === -1) break;
+        arrowPositions.push(arrowIndex);
+        searchIndex = arrowIndex + 2;
+      }
+
+      const extractedTexts = [];
+      for (const arrowPos of arrowPositions) {
+        const precedingText = content.substring(0, arrowPos);
+        const lastArrowIndex = precedingText.lastIndexOf(startFrag);
+
+        if (lastArrowIndex !== -1) {
+          const textBetween = precedingText.substring(lastArrowIndex + 2);
+          extractedTexts.push(textBetween);
+        }
+      }
+
+      const filteredTexts = extractedTexts
+        .filter((text) => !text.includes(separator) && !text.includes(endFrag))
+        .filter(Boolean);
+      const query = filteredTexts[filteredTexts.length - 1];
+      if (!query) {
+        setArrowCount(newArrowCount);
+        return null;
+      }
+      const result = await fetch("/api/chat/agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: query }),
+      });
+      if (!result.ok) {
+        console.error("commandAgent error", result.statusText);
+        return null;
+      }
+      const data: { text: string } = await result.json();
+      const responseText = data.text ?? "";
+      const updatedSegment = `${startFrag}${query}\n${separator}\n${responseText}\n${endFrag}`;
+      setPendingSegment({ query, replacement: updatedSegment });
+      setArrowCount(newArrowCount);
+      return updatedSegment;
+    }
+    setArrowCount(newArrowCount);
+    return null;
+  }, [currentFile, arrowCount, endFrag, separator, startFrag]);
+
+  useEffect(() => {
+    if (!pendingSegment) return;
+    if (!currentFile) {
+      setPendingSegment(null);
+      return;
+    }
+
+    const currentContent = currentFile.content || "";
+    const updatedContent = replacePendingSegment(
+      currentContent,
+      pendingSegment,
+    );
+
+    if (updatedContent === null) {
+      setPendingSegment(null);
+      return;
+    }
+
+    if (updatedContent !== currentContent) {
+      setCurrentFile({ ...currentFile, content: updatedContent });
+    }
+    setPendingSegment(null);
+  }, [pendingSegment, currentFile, replacePendingSegment, setCurrentFile]);
+
   const autoSaveHandler = useCallback(
     async (fileId: number, title: string, content: string) => {
       try {
+        await commandAgent();
         await updateFileAction(fileId, title, content);
         updateFileContent(fileId, content);
       } catch (error) {
@@ -41,7 +165,7 @@ export default function Dashboard() {
       }
       setAutoSaveTimeout(null);
     },
-    [updateFileContent, setAutoSaveTimeout],
+    [updateFileContent, setAutoSaveTimeout, commandAgent],
   );
 
   const handleTextAreaChange = useCallback(

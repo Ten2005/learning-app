@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <DashboardSidebar />
       <main className="w-full">
-        <div className="flex flex-row items-center justify-between px-4 py-2 border-b">
+        <div className="flex flex-row items-center justify-between px-2 py-1 border-b">
           <SidebarTrigger />
           <Navigation />
         </div>

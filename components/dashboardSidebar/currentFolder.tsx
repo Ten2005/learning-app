@@ -143,6 +143,18 @@ export default function CurrentFolder() {
     touchStartRef.current = null;
   };
 
+  const ensureMobileSidebarStaysOpen = () => {
+    if (isMobile) {
+      setOpenMobile(true);
+    }
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (open) {
+      ensureMobileSidebarStaysOpen();
+    }
+  };
+
   const handleDeleteFile = async (fileId: number) => {
     if (!currentFolder || !currentFolder.id) return;
 
@@ -257,6 +269,8 @@ export default function CurrentFolder() {
                         handleEditFile(file.id, newTitle)
                       }
                       target={file.title || "None"}
+                      onBeforeOpen={ensureMobileSidebarStaysOpen}
+                      onOpenChange={handleDialogOpenChange}
                     />
                   </SidebarMenuAction>
                   <SidebarMenuAction
@@ -269,6 +283,8 @@ export default function CurrentFolder() {
                     <DeleteConfirmationDialog
                       deleteFunction={() => handleDeleteFile(file.id)}
                       target={file.title || "None"}
+                      onBeforeOpen={ensureMobileSidebarStaysOpen}
+                      onOpenChange={handleDialogOpenChange}
                     />
                   </SidebarMenuAction>
                 </div>

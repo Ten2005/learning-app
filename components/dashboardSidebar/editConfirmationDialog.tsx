@@ -36,7 +36,8 @@ export default function EditConfirmationDialog({
     setOpen(false);
   };
 
-  const handleTriggerClick = () => {
+  const handleTriggerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setNewTitle(target);
     onBeforeOpen?.();
   };

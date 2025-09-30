@@ -32,7 +32,8 @@ export default function DeleteConfirmationDialog({
     setIsDeleting(false);
   };
 
-  const handleTriggerClick = () => {
+  const handleTriggerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onBeforeOpen?.();
   };
   return (

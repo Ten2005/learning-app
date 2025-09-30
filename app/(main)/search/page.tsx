@@ -1,31 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2Icon } from "lucide-react";
-import { SearchIcon } from "lucide-react";
 import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, UIMessage } from "ai";
-import { useEffect, useRef, useMemo } from "react";
-import { saveMessageAction, readMessagesAction } from "./actions";
-import { useSearchParams, useRouter } from "next/navigation";
-import type { DbMessage } from "@/lib/db/chat";
-import { chatOptions } from "@/store/chat";
-import { ChatType } from "@/store/chat";
-
-type TextPart = Extract<UIMessage["parts"][number], { type: "text" }>;
-function isTextPart(part: UIMessage["parts"][number]): part is TextPart {
-  return part.type === "text";
-}
+import { DefaultChatTransport } from "ai";
+import { useMemo, useRef } from "react";
+import { saveMessageAction } from "./actions";
+import { useRouter } from "next/navigation";
+import { extractMessageText } from "@/utils/message";
+import { useConversationSync } from "@/hooks/search/useConversationSync";
+import { ChatHeader } from "@/components/chat/chatHeader";
+import { ChatInput } from "@/components/chat/chatInput";
 
 export default function SearchPage() {
   const {
@@ -33,64 +18,33 @@ export default function SearchPage() {
     setCurrentConversationId,
     chatType,
     setChatType,
+    input,
+    setInput,
   } = useChatStore();
-  const searchParams = useSearchParams();
-  const { input, setInput } = useChatStore();
-  const conversationIdRef = useRef<number | null>(null);
   const router = useRouter();
-  useEffect(() => {
-    conversationIdRef.current = currentConversationId;
-  }, [currentConversationId]);
+  const conversationIdRef = useRef<number | null>(currentConversationId);
+
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
     [chatType],
   );
+
   const { messages, setMessages, sendMessage, status } = useChat({
     id: chatType,
     transport,
     onFinish: async ({ message }) => {
       try {
-        const text = (message.parts ?? [])
-          .map((part) => (isTextPart(part) ? part.text : ""))
-          .join("");
+        const text = extractMessageText(message);
         if (text) {
-          const savedId = await saveMessageAction(
-            conversationIdRef.current,
-            text,
-            "assistant",
-          );
-          if (!conversationIdRef.current) setCurrentConversationId(savedId);
+          await saveMessageAction(conversationIdRef.current, text, "assistant");
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error("Failed to save assistant message:", error);
       }
     },
   });
 
-  useEffect(() => {
-    const c = searchParams.get("c");
-    const parsed = c ? Number(c) : null;
-    if (!parsed || Number.isNaN(parsed)) {
-      setCurrentConversationId(null);
-      setMessages([]);
-      return;
-    }
-    setCurrentConversationId(parsed);
-    (async () => {
-      try {
-        const dbMessages = await readMessagesAction(parsed);
-        setMessages(
-          dbMessages.map((m: DbMessage) => ({
-            id: String(m.id),
-            role: m.role,
-            parts: [{ type: "text", text: m.content }],
-          })),
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-  }, [searchParams, setMessages, setCurrentConversationId]);
+  useConversationSync(setMessages, setCurrentConversationId);
 
   const handleClearChat = () => {
     setMessages([]);
@@ -98,35 +52,24 @@ export default function SearchPage() {
     router.push("/search");
   };
 
+  const handleSubmit = async (inputText: string) => {
+    const savedId = await saveMessageAction(
+      currentConversationId,
+      inputText,
+      "user",
+    );
+    conversationIdRef.current = savedId;
+    setCurrentConversationId(savedId);
+    await sendMessage({ text: inputText });
+  };
+
   return (
     <div className="flex flex-col h-[100dvh]">
-      <div className="flex flex-col gap-1 py-2 px-4 sticky top-0 bg-background z-5">
-        <div className="flex w-full justify-between items-center">
-          <Button
-            size="sm"
-            onClick={() => {
-              handleClearChat();
-            }}
-          >
-            New Chat
-          </Button>
-          <Select
-            value={chatType}
-            onValueChange={(v) => setChatType(v as ChatType)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Theme" />
-            </SelectTrigger>
-            <SelectContent>
-              {chatOptions.map((value) => (
-                <SelectItem key={value} value={value as ChatType}>
-                  {value}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <ChatHeader
+        chatType={chatType}
+        onChatTypeChange={setChatType}
+        onNewChat={handleClearChat}
+      />
       <div className="p-2 h-[100dvh] overflow-y-auto">
         {messages.map((message) => (
           <Message
@@ -136,43 +79,12 @@ export default function SearchPage() {
           />
         ))}
       </div>
-      <div className="flex w-full items-center gap-2 px-4 py-2 sticky bottom-0 bg-background">
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            if (!input || status !== "ready") return;
-            const sendInput = await input;
-            setInput("");
-            const returnConversationId = await saveMessageAction(
-              currentConversationId,
-              sendInput,
-              "user",
-            );
-            setCurrentConversationId(returnConversationId);
-            await sendMessage({ text: sendInput });
-          }}
-          className="flex w-full items-start gap-2"
-        >
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={status !== "ready"}
-            className="resize-none"
-          />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={!input || status !== "ready"}
-            aria-busy={status !== "ready"}
-          >
-            {status == "ready" ? (
-              <SearchIcon className="size-4" />
-            ) : (
-              <Loader2Icon className="size-4 animate-spin" />
-            )}
-          </Button>
-        </form>
-      </div>
+      <ChatInput
+        input={input}
+        status={status}
+        onInputChange={setInput}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }

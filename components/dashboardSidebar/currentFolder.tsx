@@ -33,6 +33,8 @@ export default function CurrentFolder() {
     null,
   );
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const editDialogOpenRef = useRef(false);
+  const deleteDialogOpenRef = useRef(false);
 
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
@@ -215,7 +217,11 @@ export default function CurrentFolder() {
               if (!isDragging) {
                 setCurrentFile(file);
                 // Close sidebar on mobile when file is selected
-                if (isMobile) {
+                if (
+                  isMobile &&
+                  !editDialogOpenRef.current &&
+                  !deleteDialogOpenRef.current
+                ) {
                   setOpenMobile(false);
                 }
               }
@@ -257,6 +263,18 @@ export default function CurrentFolder() {
                         handleEditFile(file.id, newTitle)
                       }
                       target={file.title || "None"}
+                      onBeforeOpen={() => {
+                        editDialogOpenRef.current = true;
+                        if (isMobile) {
+                          setOpenMobile(true);
+                        }
+                      }}
+                      onOpenChange={(open) => {
+                        editDialogOpenRef.current = open;
+                        if (isMobile && open) {
+                          setOpenMobile(true);
+                        }
+                      }}
                     />
                   </SidebarMenuAction>
                   <SidebarMenuAction
@@ -269,6 +287,21 @@ export default function CurrentFolder() {
                     <DeleteConfirmationDialog
                       deleteFunction={() => handleDeleteFile(file.id)}
                       target={file.title || "None"}
+                      onBeforeOpen={() => {
+                        deleteDialogOpenRef.current = true;
+                        if (isMobile) {
+                          setOpenMobile(true);
+                        }
+                      }}
+                      onOpenChange={(open) => {
+                        deleteDialogOpenRef.current = open;
+                        if (isMobile && open) {
+                          setOpenMobile(true);
+                        }
+                        if (!open) {
+                          deleteDialogOpenRef.current = false;
+                        }
+                      }}
                     />
                   </SidebarMenuAction>
                 </div>

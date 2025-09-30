@@ -8,6 +8,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenuAction,
+  useSidebar,
 } from "../ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
@@ -43,6 +44,7 @@ export default function Folders({
     folders,
   } = useSidebarStore();
   const { setCurrentFile } = useDashboardStore();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const debounceTimers = useRef<Map<number, NodeJS.Timeout>>(new Map());
 
@@ -156,6 +158,18 @@ export default function Folders({
     }
   };
 
+  const ensureMobileSidebarStaysOpen = () => {
+    if (isMobile) {
+      setOpenMobile(true);
+    }
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (open) {
+      ensureMobileSidebarStaysOpen();
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Folders</SidebarGroupLabel>
@@ -213,6 +227,8 @@ export default function Folders({
                         handleEditFolder(folder.id, newName)
                       }
                       target={folder.name}
+                      onBeforeOpen={ensureMobileSidebarStaysOpen}
+                      onOpenChange={handleDialogOpenChange}
                     />
                   </SidebarMenuAction>
                   <SidebarMenuAction
@@ -225,6 +241,8 @@ export default function Folders({
                     <DeleteConfirmationDialog
                       deleteFunction={() => handleDeleteFolder(folder.id)}
                       target={folder.name}
+                      onBeforeOpen={ensureMobileSidebarStaysOpen}
+                      onOpenChange={handleDialogOpenChange}
                     />
                   </SidebarMenuAction>
                 </div>

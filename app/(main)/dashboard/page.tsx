@@ -8,6 +8,12 @@ import { useAutoSave } from "@/hooks/dashboard/useAutoSave";
 import { useSegmentParser } from "@/hooks/dashboard/useSegmentParser";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { EditorTextarea } from "@/components/dashboard/EditorTextarea";
+import {
+  SEGMENT_START_FRAG,
+  SEGMENT_END_FRAG,
+  DELETE_START_FRAG,
+  DELETE_END_FRAG,
+} from "@/constants/dashboard";
 
 export default function Dashboard() {
   const { currentFile, setCurrentFile } = useDashboardStore();
@@ -16,7 +22,14 @@ export default function Dashboard() {
   const { processCommandAgent, pendingSegment, setPendingSegment } =
     useCommandAgent(currentFile?.content);
   const { scheduleAutoSave } = useAutoSave(processCommandAgent);
-  const { replacePendingSegment } = useSegmentParser();
+  const { replacePendingSegment } = useSegmentParser(
+    SEGMENT_START_FRAG,
+    SEGMENT_END_FRAG,
+  );
+  const { removeSegments } = useSegmentParser(
+    DELETE_START_FRAG,
+    DELETE_END_FRAG,
+  );
 
   useEffect(() => {
     if (isMobile && !currentFile) {
@@ -57,7 +70,10 @@ export default function Dashboard() {
   const handleTextAreaChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (currentFile) {
-        const updatedFile = { ...currentFile, content: e.target.value };
+        let content = e.target.value;
+        content = removeSegments(content);
+
+        const updatedFile = { ...currentFile, content };
         setCurrentFile(updatedFile);
 
         scheduleAutoSave(
@@ -67,7 +83,7 @@ export default function Dashboard() {
         );
       }
     },
-    [currentFile, setCurrentFile, scheduleAutoSave],
+    [currentFile, setCurrentFile, scheduleAutoSave, removeSegments],
   );
 
   return (

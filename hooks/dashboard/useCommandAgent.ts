@@ -14,7 +14,10 @@ export function useCommandAgent(currentFileContent: string | undefined) {
     null,
   );
 
-  const { extractLatestQuery, countEndFragments } = useSegmentParser();
+  const { extractLatestQuery, countEndFragments } = useSegmentParser(
+    SEGMENT_START_FRAG,
+    SEGMENT_END_FRAG,
+  );
 
   const processCommandAgent = useCallback(async (): Promise<string | null> => {
     if (!currentFileContent) return null;

@@ -1,126 +1,28 @@
 "use client";
 
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
-import PageButtons from "@/components/dashboard/pageButton";
-import { useSidebarStore } from "@/store/sidebar";
-import { updateFileAction } from "./actions";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useCallback, useEffect } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
-
-type PendingSegment = {
-  query: string;
-  replacement: string;
-};
+import { useCommandAgent } from "@/hooks/dashboard/useCommandAgent";
+import { useAutoSave } from "@/hooks/dashboard/useAutoSave";
+import { useSegmentParser } from "@/hooks/dashboard/useSegmentParser";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { EditorTextarea } from "@/components/dashboard/EditorTextarea";
 
 export default function Dashboard() {
-  const { currentFile, setCurrentFile, autoSaveTimeout, setAutoSaveTimeout } =
-    useDashboardStore();
-  const { currentFolder, updateFileContent } = useSidebarStore();
+  const { currentFile, setCurrentFile } = useDashboardStore();
   const { isMobile, setOpenMobile } = useSidebar();
 
-  // Open sidebar when no file is selected (mobile)
+  const { processCommandAgent, pendingSegment, setPendingSegment } =
+    useCommandAgent(currentFile?.content);
+  const { scheduleAutoSave } = useAutoSave(processCommandAgent);
+  const { replacePendingSegment } = useSegmentParser();
+
   useEffect(() => {
     if (isMobile && !currentFile) {
       setOpenMobile(true);
     }
   }, [currentFile, isMobile, setOpenMobile]);
-
-  const startFrag = "->";
-  const endFrag = "<-";
-  const separator = "--";
-  const [arrowCount, setArrowCount] = useState(0);
-  const initialized = useRef(false);
-  const [pendingSegment, setPendingSegment] = useState<PendingSegment | null>(
-    null,
-  );
-
-  const replacePendingSegment = useCallback(
-    (content: string, segment: PendingSegment): string | null => {
-      const startToken = `${startFrag}${segment.query}`;
-      const startIndex = content.indexOf(startToken);
-      if (startIndex === -1) {
-        return null;
-      }
-
-      const searchFrom = startIndex + startToken.length;
-      const endIndex = content.indexOf(endFrag, searchFrom);
-      if (endIndex === -1) {
-        return null;
-      }
-
-      const before = content.slice(0, startIndex);
-      const after = content.slice(endIndex + endFrag.length);
-      return `${before}${segment.replacement}${after}`;
-    },
-    [endFrag, startFrag],
-  );
-
-  const commandAgent = useCallback(async (): Promise<string | null> => {
-    if (!currentFile) return null;
-    const contentForScan = currentFile.content || "";
-    const newArrowCount = contentForScan.split(endFrag).length - 1;
-
-    if (!initialized.current) {
-      initialized.current = true;
-      setArrowCount(newArrowCount);
-      return null;
-    }
-
-    if (newArrowCount > arrowCount) {
-      const content = currentFile.content || "";
-      const arrowPositions = [];
-      let searchIndex = 0;
-
-      while (true) {
-        const arrowIndex = content.indexOf(endFrag, searchIndex);
-        if (arrowIndex === -1) break;
-        arrowPositions.push(arrowIndex);
-        searchIndex = arrowIndex + 2;
-      }
-
-      const extractedTexts = [];
-      for (const arrowPos of arrowPositions) {
-        const precedingText = content.substring(0, arrowPos);
-        const lastArrowIndex = precedingText.lastIndexOf(startFrag);
-
-        if (lastArrowIndex !== -1) {
-          const textBetween = precedingText.substring(lastArrowIndex + 2);
-          extractedTexts.push(textBetween);
-        }
-      }
-
-      const filteredTexts = extractedTexts
-        .filter((text) => !text.includes(separator) && !text.includes(endFrag))
-        .filter(Boolean);
-      const query = filteredTexts[filteredTexts.length - 1];
-      if (!query) {
-        setArrowCount(newArrowCount);
-        return null;
-      }
-      const result = await fetch("/api/chat/agent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: query }),
-      });
-      if (!result.ok) {
-        console.error("commandAgent error", result.statusText);
-        return null;
-      }
-      const data: { text: string } = await result.json();
-      const responseText = data.text ?? "";
-      const updatedSegment = `${startFrag}\n${query}\n${separator}\n${responseText}\n${endFrag}`;
-      setPendingSegment({ query, replacement: updatedSegment });
-      setArrowCount(newArrowCount);
-      return updatedSegment;
-    }
-    setArrowCount(newArrowCount);
-    return null;
-  }, [currentFile, arrowCount, endFrag, separator, startFrag]);
 
   useEffect(() => {
     if (!pendingSegment) return;
@@ -144,21 +46,13 @@ export default function Dashboard() {
       setCurrentFile({ ...currentFile, content: updatedContent });
     }
     setPendingSegment(null);
-  }, [pendingSegment, currentFile, replacePendingSegment, setCurrentFile]);
-
-  const autoSaveHandler = useCallback(
-    async (fileId: number, title: string, content: string) => {
-      try {
-        await commandAgent();
-        await updateFileAction(fileId, title, content);
-        updateFileContent(fileId, content);
-      } catch (error) {
-        console.error("Auto-save failed:", error);
-      }
-      setAutoSaveTimeout(null);
-    },
-    [updateFileContent, setAutoSaveTimeout, commandAgent],
-  );
+  }, [
+    pendingSegment,
+    currentFile,
+    replacePendingSegment,
+    setCurrentFile,
+    setPendingSegment,
+  ]);
 
   const handleTextAreaChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -166,65 +60,24 @@ export default function Dashboard() {
         const updatedFile = { ...currentFile, content: e.target.value };
         setCurrentFile(updatedFile);
 
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-        }
-
-        const timeout = setTimeout(() => {
-          autoSaveHandler(
-            updatedFile.id,
-            updatedFile.title || "",
-            updatedFile.content || "",
-          );
-        }, 500);
-
-        setAutoSaveTimeout(timeout);
+        scheduleAutoSave(
+          updatedFile.id,
+          updatedFile.title || "",
+          updatedFile.content || "",
+        );
       }
     },
-    [
-      currentFile,
-      setCurrentFile,
-      autoSaveTimeout,
-      setAutoSaveTimeout,
-      autoSaveHandler,
-    ],
+    [currentFile, setCurrentFile, scheduleAutoSave],
   );
 
   return (
     <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
-      <div className="flex flex-col justify-between py-1 px-2 sticky top-0 bg-background z-5">
-        <div className="flex flex-row justify-between pb-1">
-          <ShowTitle />
-          {currentFolder && <PageButtons />}
-        </div>
-      </div>
-      <Textarea
+      <DashboardHeader />
+      <EditorTextarea
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}
         disabled={!currentFile}
-        className="
-        w-full flex-1
-        resize-none border-none focus:border-none focus-visible:ring-0"
       />
-    </div>
-  );
-}
-
-function ShowTitle() {
-  const { currentFile } = useDashboardStore();
-  const { currentFolder } = useSidebarStore();
-  return (
-    <div className="flex flex-row items-center max-w-full truncate overflow-x-auto scrollbar-hide">
-      <span className="text-xs text-muted-foreground px-1">
-        {currentFolder?.name} -&gt; {currentFile?.page} :
-      </span>
-      <Label
-        className={cn(
-          currentFile?.title ? "text-primary" : "text-muted-foreground",
-        )}
-      >
-        {currentFile?.title ? currentFile.title : "None"}
-      </Label>
     </div>
   );
 }

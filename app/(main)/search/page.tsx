@@ -4,13 +4,14 @@ import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { saveMessageAction } from "./actions";
 import { useRouter } from "next/navigation";
 import { extractMessageText } from "@/utils/message";
 import { useConversationSync } from "@/hooks/search/useConversationSync";
 import { ChatHeader } from "@/components/chat/chatHeader";
 import { ChatInput } from "@/components/chat/chatInput";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function SearchPage() {
   const {
@@ -23,6 +24,7 @@ export default function SearchPage() {
   } = useChatStore();
   const router = useRouter();
   const conversationIdRef = useRef<number | null>(currentConversationId);
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
@@ -45,6 +47,12 @@ export default function SearchPage() {
   });
 
   useConversationSync(setMessages, setCurrentConversationId);
+
+  useEffect(() => {
+    if (isMobile && currentConversationId) {
+      setOpenMobile(false);
+    }
+  }, [currentConversationId, isMobile, setOpenMobile]);
 
   const handleClearChat = () => {
     setMessages([]);

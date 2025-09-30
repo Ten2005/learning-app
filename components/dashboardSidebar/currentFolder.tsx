@@ -29,6 +29,7 @@ export default function CurrentFolder() {
   const [isDragging, setIsDragging] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(
     null,
   );
@@ -215,7 +216,7 @@ export default function CurrentFolder() {
               if (!isDragging) {
                 setCurrentFile(file);
                 // Close sidebar on mobile when file is selected
-                if (isMobile) {
+                if (isMobile && !isDialogOpen) {
                   setOpenMobile(false);
                 }
               }
@@ -257,6 +258,8 @@ export default function CurrentFolder() {
                         handleEditFile(file.id, newTitle)
                       }
                       target={file.title || "None"}
+                      onBeforeOpen={() => setIsDialogOpen(true)}
+                      onOpenChange={setIsDialogOpen}
                     />
                   </SidebarMenuAction>
                   <SidebarMenuAction
@@ -269,6 +272,8 @@ export default function CurrentFolder() {
                     <DeleteConfirmationDialog
                       deleteFunction={() => handleDeleteFile(file.id)}
                       target={file.title || "None"}
+                      onBeforeOpen={() => setIsDialogOpen(true)}
+                      onOpenChange={setIsDialogOpen}
                     />
                   </SidebarMenuAction>
                 </div>

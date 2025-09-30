@@ -1,55 +1,65 @@
 "use client";
 
-import { MenuIcon, XIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import { useMemo } from "react";
+import Link from "next/link";
+
+const links = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/search", label: "Search" },
+  { href: "/schedule", label: "Schedule" },
+];
 
 export default function Navigation() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const memoizedLinks = useMemo(() => links, []);
 
   return (
-    <DropdownMenu onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          {isOpen ? (
-            <XIcon className="size-5" />
-          ) : (
-            <MenuIcon className="size-5" />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuLabel>Nav</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link
-            href="/dashboard"
-            className={cn(pathname === "/dashboard" && "font-bold")}
-          >
-            Dashboard
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href="/search"
-            className={cn(pathname === "/search" && "font-bold")}
-          >
-            Search
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>
+            {pathname.split("/").pop()}
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            {memoizedLinks.map((link) => (
+              <NavigationLink
+                key={link.href}
+                href={link.href}
+                label={link.label}
+                pathname={pathname}
+              />
+            ))}
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
+export function NavigationLink({
+  href,
+  label,
+  pathname,
+}: {
+  href: string;
+  label: string;
+  pathname: string;
+}) {
+  return (
+    <NavigationMenuLink key={href} asChild>
+      <Link href={href} className={cn(pathname === href && "font-bold")}>
+        {label}
+      </Link>
+    </NavigationMenuLink>
   );
 }

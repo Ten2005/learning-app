@@ -1,11 +1,9 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function Error() {
-  const router = useRouter();
   return (
     <div className="flex flex-col items-center justify-center h-screen p-4">
       <div>
@@ -14,7 +12,7 @@ export default function Error() {
           <AlertDescription className="flex flex-col gap-2">
             Something went wrong. Please try again.
             <div className="flex justify-end w-full">
-              <Button size="sm" onClick={() => router.refresh()}>
+              <Button size="sm" onClick={() => window.location.reload()}>
                 Reload
               </Button>
             </div>

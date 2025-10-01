@@ -70,26 +70,33 @@ export function useSegmentParser(startToken: string, endToken: string) {
 
   const removeSegments = useCallback(
     (content: string): string => {
-      let result = content;
+      const endPositions: number[] = [];
       let searchIndex = 0;
 
       while (true) {
-        const startIndex = result.indexOf(startToken, searchIndex);
-        if (startIndex === -1) break;
-
-        const endIndex = result.indexOf(
-          endToken,
-          startIndex + startToken.length,
-        );
+        const endIndex = content.indexOf(endToken, searchIndex);
         if (endIndex === -1) break;
-
-        const before = result.slice(0, startIndex);
-        const after = result.slice(endIndex + endToken.length);
-        result = before + after;
-        searchIndex = startIndex;
+        endPositions.push(endIndex);
+        searchIndex = endIndex + endToken.length;
       }
 
-      return result;
+      const segmentsToRemove = endPositions
+        .map((endPos) => {
+          const precedingText = content.substring(0, endPos);
+          const startPos = precedingText.lastIndexOf(startToken);
+
+          if (startPos !== -1) {
+            return { start: startPos, end: endPos + endToken.length };
+          }
+          return null;
+        })
+        .filter((seg): seg is { start: number; end: number } => seg !== null)
+        .sort((a, b) => b.start - a.start);
+
+      return segmentsToRemove.reduce(
+        (text, seg) => text.slice(0, seg.start) + text.slice(seg.end),
+        content,
+      );
     },
     [startToken, endToken],
   );

@@ -25,6 +25,7 @@ export default function SearchPage() {
   const router = useRouter();
   const conversationIdRef = useRef<number | null>(currentConversationId);
   const { isMobile, setOpenMobile } = useSidebar();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
@@ -53,6 +54,13 @@ export default function SearchPage() {
       setOpenMobile(false);
     }
   }, [currentConversationId, isMobile, setOpenMobile]);
+
+  // メッセージが更新されたとき、または生成中のときに自動スクロール
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, status]);
 
   const handleClearChat = () => {
     setMessages([]);
@@ -86,6 +94,7 @@ export default function SearchPage() {
             isUser={message.role === "user"}
           />
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <ChatInput
         input={input}

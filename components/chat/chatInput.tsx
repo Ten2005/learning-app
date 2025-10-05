@@ -1,7 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2Icon, SearchIcon } from "lucide-react";
 import type { ChatStatus } from "ai";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+} from "@/components/ui/input-group";
+import { Spinner } from "@/components/ui/spinner";
+import TextareaAutosize from "react-textarea-autosize";
 
 interface ChatInputProps {
   input: string;
@@ -28,27 +32,32 @@ export function ChatInput({
   };
 
   return (
-    <div className="flex w-full items-center gap-2 px-4 py-2 sticky bottom-0 bg-background">
-      <form onSubmit={handleSubmit} className="flex w-full items-start gap-2">
-        <Textarea
+    <form
+      onSubmit={handleSubmit}
+      className="flex w-full items-center gap-2 px-4 py-2 sticky bottom-0 bg-background"
+    >
+      <InputGroup>
+        <TextareaAutosize
           value={input}
-          onChange={(e) => onInputChange(e.target.value)}
-          disabled={!isReady}
-          className="resize-none"
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            onInputChange(e.target.value)
+          }
+          className="flex field-sizing-content min-h-16 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none"
         />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={!input || !isReady}
-          aria-busy={!isReady}
-        >
-          {isReady ? (
-            <SearchIcon className="size-4" />
-          ) : (
-            <Loader2Icon className="size-4 animate-spin" />
-          )}
-        </Button>
-      </form>
-    </div>
+        <InputGroupAddon align="block-end">
+          <InputGroupButton
+            type="submit"
+            className="ml-auto"
+            size="sm"
+            variant="default"
+            disabled={!input || !isReady}
+            aria-busy={!isReady}
+          >
+            {!isReady && <Spinner />}
+            Submit
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+    </form>
   );
 }

@@ -25,7 +25,7 @@ export default function SearchPage() {
   const router = useRouter();
   const conversationIdRef = useRef<number | null>(currentConversationId);
   const { isMobile, setOpenMobile } = useSidebar();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const latestUserMessageRef = useRef<HTMLDivElement>(null);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
@@ -55,12 +55,15 @@ export default function SearchPage() {
     }
   }, [currentConversationId, isMobile, setOpenMobile]);
 
-  // メッセージが更新されたとき、または生成中のときに自動スクロール
+  // 最新のユーザーメッセージを画面上部にスクロール
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (latestUserMessageRef.current) {
+      latestUserMessageRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
-  }, [messages, status]);
+  }, [messages]);
 
   const handleClearChat = () => {
     setMessages([]);
@@ -79,6 +82,14 @@ export default function SearchPage() {
     await sendMessage({ text: inputText });
   };
 
+  // 最新のユーザーメッセージのインデックスを見つける
+  const latestUserMessageIndex = messages.reduce(
+    (latestIndex, message, index) => {
+      return message.role === "user" ? index : latestIndex;
+    },
+    -1,
+  );
+
   return (
     <div className="flex flex-col h-[100dvh]">
       <ChatHeader
@@ -87,14 +98,14 @@ export default function SearchPage() {
         onNewChat={handleClearChat}
       />
       <div className="p-2 h-[100dvh] overflow-y-auto">
-        {messages.map((message) => (
-          <Message
+        {messages.map((message, index) => (
+          <div
             key={message.id}
-            parts={message.parts}
-            isUser={message.role === "user"}
-          />
+            ref={index === latestUserMessageIndex ? latestUserMessageRef : null}
+          >
+            <Message parts={message.parts} isUser={message.role === "user"} />
+          </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
       <ChatInput
         input={input}

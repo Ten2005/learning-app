@@ -26,6 +26,7 @@ export default function SearchPage() {
   const conversationIdRef = useRef<number | null>(currentConversationId);
   const { isMobile, setOpenMobile } = useSidebar();
   const latestUserMessageRef = useRef<HTMLDivElement>(null);
+  const previousUserMessageKeyRef = useRef<string | null>(null);
 
   const transport = useMemo(
     () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
@@ -55,15 +56,54 @@ export default function SearchPage() {
     }
   }, [currentConversationId, isMobile, setOpenMobile]);
 
+  const { latestUserMessage, latestUserMessageIndex } = useMemo(() => {
+    let latestIndex = -1;
+    let latestMessage: (typeof messages)[number] | null = null;
+
+    messages.forEach((message, index) => {
+      if (message.role === "user") {
+        latestIndex = index;
+        latestMessage = message;
+      }
+    });
+
+    return {
+      latestUserMessage: latestMessage,
+      latestUserMessageIndex: latestIndex,
+    };
+  }, [messages]);
+
+  const latestUserMessageKey = useMemo(() => {
+    if (latestUserMessageIndex === -1 || !latestUserMessage) {
+      return null;
+    }
+
+    const text = extractMessageText(latestUserMessage) ?? "";
+    const id = latestUserMessage.id ?? `index-${latestUserMessageIndex}`;
+
+    return `${id}:${text}`;
+  }, [latestUserMessage, latestUserMessageIndex]);
+
   // 最新のユーザーメッセージを画面上部にスクロール
   useEffect(() => {
-    if (latestUserMessageRef.current) {
+    if (!latestUserMessageKey) {
+      previousUserMessageKeyRef.current = null;
+      return;
+    }
+
+    const hasPreviousUserMessage = previousUserMessageKeyRef.current !== null;
+    const hasNewUserMessage =
+      previousUserMessageKeyRef.current !== latestUserMessageKey;
+
+    if (hasNewUserMessage && latestUserMessageRef.current) {
       latestUserMessageRef.current.scrollIntoView({
-        behavior: "smooth",
+        behavior: hasPreviousUserMessage ? "smooth" : "auto",
         block: "start",
       });
     }
-  }, [messages]);
+
+    previousUserMessageKeyRef.current = latestUserMessageKey;
+  }, [latestUserMessageKey]);
 
   const handleClearChat = () => {
     setMessages([]);
@@ -81,14 +121,6 @@ export default function SearchPage() {
     setCurrentConversationId(savedId);
     await sendMessage({ text: inputText });
   };
-
-  // 最新のユーザーメッセージのインデックスを見つける
-  const latestUserMessageIndex = messages.reduce(
-    (latestIndex, message, index) => {
-      return message.role === "user" ? index : latestIndex;
-    },
-    -1,
-  );
 
   return (
     <div className="flex flex-col h-[100dvh]">

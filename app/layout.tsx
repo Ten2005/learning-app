@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from "@/constants/index";
+import { ServiceWorker } from "@/components/service-worker";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,6 +33,7 @@ export default function RootLayout({
           {children}
           <Toaster />
         </ThemeProvider>
+        <ServiceWorker />
       </body>
     </html>
   );

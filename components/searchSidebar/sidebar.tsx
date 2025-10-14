@@ -10,6 +10,7 @@ import {
 import { ModeToggle } from "../modeToggle";
 import { readConversationsAction } from "@/app/(main)/search/actions";
 import ConversationItem from "@/components/searchSidebar/conversationItem";
+import DeleteAllButton from "@/components/searchSidebar/deleteAllButton";
 
 export async function SearchSidebar() {
   const conversations = await readConversationsAction();
@@ -19,6 +20,11 @@ export async function SearchSidebar() {
         <ModeToggle />
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <DeleteAllButton />
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>

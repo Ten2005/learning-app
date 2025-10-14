@@ -11,7 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeftIcon, Loader2 } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth";
@@ -76,7 +77,7 @@ export default function Signup() {
               onClick={handleSignup}
               disabled={isLoading}
             >
-              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {isLoading && <Spinner className="w-4 h-4 mr-2 animate-spin" />}
               Signup
             </Button>
           </CardAction>

@@ -7,7 +7,6 @@ import { DefaultChatTransport } from "ai";
 import { useMemo, useRef, useEffect } from "react";
 import { saveMessageAction } from "./actions";
 import { useRouter } from "next/navigation";
-import { extractMessageText } from "@/utils/message";
 import { useConversationSync } from "@/hooks/search/useConversationSync";
 import { ChatHeader } from "@/components/chat/chatHeader";
 import { ChatInput } from "@/components/chat/chatInput";
@@ -26,25 +25,27 @@ export default function SearchPage() {
   const conversationIdRef = useRef<number | null>(currentConversationId);
   const { isMobile, setOpenMobile } = useSidebar();
   const latestUserMessageRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(0);
 
   const transport = useMemo(
-    () => new DefaultChatTransport({ api: `/api/chat/${chatType}` }),
+    () =>
+      new DefaultChatTransport({
+        api: `/api/chat/${chatType}`,
+        fetch: async (url, options) => {
+          const body = JSON.parse(options?.body as string);
+          body.conversationId = conversationIdRef.current;
+          return fetch(url, {
+            ...options,
+            body: JSON.stringify(body),
+          });
+        },
+      }),
     [chatType],
   );
 
   const { messages, setMessages, sendMessage, status } = useChat({
     id: chatType,
     transport,
-    onFinish: async ({ message }) => {
-      try {
-        const text = extractMessageText(message);
-        if (text) {
-          await saveMessageAction(conversationIdRef.current, text, "assistant");
-        }
-      } catch (error) {
-        console.error("Failed to save assistant message:", error);
-      }
-    },
   });
 
   useConversationSync(setMessages, setCurrentConversationId);
@@ -57,12 +58,19 @@ export default function SearchPage() {
 
   // 最新のユーザーメッセージを画面上部にスクロール
   useEffect(() => {
-    if (latestUserMessageRef.current) {
-      latestUserMessageRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    // 新しいメッセージが追加された場合のみチェック
+    if (messages.length > prevMessagesLengthRef.current) {
+      const lastMessage = messages[messages.length - 1];
+      // 最後に追加されたメッセージがユーザーメッセージの場合のみスクロール
+      if (lastMessage?.role === "user" && latestUserMessageRef.current) {
+        latestUserMessageRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
+    // 現在のメッセージ数を保存
+    prevMessagesLengthRef.current = messages.length;
   }, [messages]);
 
   const handleClearChat = () => {
@@ -97,7 +105,7 @@ export default function SearchPage() {
         onChatTypeChange={setChatType}
         onNewChat={handleClearChat}
       />
-      <div className="p-2 h-[100dvh] overflow-y-auto">
+      <div className="p-2 h-[100dvh] overflow-y-auto sticky top-10 flex flex-col gap-6">
         {messages.map((message, index) => (
           <div
             key={message.id}

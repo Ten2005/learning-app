@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2Icon, Edit2Icon } from "lucide-react";
+import { Edit2Icon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 
 export default function EditConfirmationDialog({
@@ -56,11 +57,7 @@ export default function EditConfirmationDialog({
           disabled={isEditing}
           onClick={handleTriggerClick}
         >
-          {isEditing ? (
-            <Loader2Icon className="w-4 h-4 animate-spin" />
-          ) : (
-            <Edit2Icon className="w-4 h-4" />
-          )}
+          {isEditing ? <Spinner /> : <Edit2Icon className="w-4 h-4" />}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -84,11 +81,7 @@ export default function EditConfirmationDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleEdit} disabled={isEditing}>
-            {isEditing ? (
-              <Loader2Icon className="w-4 h-4 animate-spin" />
-            ) : (
-              "Edit"
-            )}
+            {isEditing ? <Spinner /> : "Edit"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

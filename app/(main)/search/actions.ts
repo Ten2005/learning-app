@@ -8,6 +8,7 @@ import {
   readConversations,
   deleteConversation,
   updateConversation,
+  deleteAllConversations,
 } from "@/lib/db/chat";
 
 export async function saveMessageAction(
@@ -49,6 +50,12 @@ export async function updateConversationAction(
 
 export async function deleteConversationAction(conversation_id: number) {
   await deleteConversation(conversation_id);
+  revalidatePath("/search");
+  revalidateTag("messages");
+}
+
+export async function deleteAllConversationsAction() {
+  await deleteAllConversations();
   revalidatePath("/search");
   revalidateTag("messages");
 }

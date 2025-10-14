@@ -249,63 +249,61 @@ export default function CurrentFolder() {
               style={{ touchAction: isDragging ? "none" : "auto" }}
             >
               <span className="max-w-24 truncate">{file.title}</span>
-              {currentFile?.id === file.id && (
-                <div>
-                  <SidebarMenuAction
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    asChild
-                    showOnHover
-                  >
-                    <EditConfirmationDialog
-                      editFunction={(newTitle) =>
-                        handleEditFile(file.id, newTitle)
+              <div>
+                <SidebarMenuAction
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  asChild
+                  showOnHover
+                >
+                  <EditConfirmationDialog
+                    editFunction={(newTitle) =>
+                      handleEditFile(file.id, newTitle)
+                    }
+                    target={file.title || "None"}
+                    onBeforeOpen={() => {
+                      editDialogOpenRef.current = true;
+                      if (isMobile) {
+                        setOpenMobile(true);
                       }
-                      target={file.title || "None"}
-                      onBeforeOpen={() => {
-                        editDialogOpenRef.current = true;
-                        if (isMobile) {
-                          setOpenMobile(true);
-                        }
-                      }}
-                      onOpenChange={(open) => {
-                        editDialogOpenRef.current = open;
-                        if (isMobile && open) {
-                          setOpenMobile(true);
-                        }
-                      }}
-                    />
-                  </SidebarMenuAction>
-                  <SidebarMenuAction
-                    onClick={(e) => {
-                      e.stopPropagation();
                     }}
-                    asChild
-                    showOnHover
-                  >
-                    <DeleteConfirmationDialog
-                      deleteFunction={() => handleDeleteFile(file.id)}
-                      target={file.title || "None"}
-                      onBeforeOpen={() => {
-                        deleteDialogOpenRef.current = true;
-                        if (isMobile) {
-                          setOpenMobile(true);
-                        }
-                      }}
-                      onOpenChange={(open) => {
-                        deleteDialogOpenRef.current = open;
-                        if (isMobile && open) {
-                          setOpenMobile(true);
-                        }
-                        if (!open) {
-                          deleteDialogOpenRef.current = false;
-                        }
-                      }}
-                    />
-                  </SidebarMenuAction>
-                </div>
-              )}
+                    onOpenChange={(open) => {
+                      editDialogOpenRef.current = open;
+                      if (isMobile && open) {
+                        setOpenMobile(true);
+                      }
+                    }}
+                  />
+                </SidebarMenuAction>
+                <SidebarMenuAction
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  asChild
+                  showOnHover
+                >
+                  <DeleteConfirmationDialog
+                    deleteFunction={() => handleDeleteFile(file.id)}
+                    target={file.title || "None"}
+                    onBeforeOpen={() => {
+                      deleteDialogOpenRef.current = true;
+                      if (isMobile) {
+                        setOpenMobile(true);
+                      }
+                    }}
+                    onOpenChange={(open) => {
+                      deleteDialogOpenRef.current = open;
+                      if (isMobile && open) {
+                        setOpenMobile(true);
+                      }
+                      if (!open) {
+                        deleteDialogOpenRef.current = false;
+                      }
+                    }}
+                  />
+                </SidebarMenuAction>
+              </div>
             </div>
           </SidebarMenuButton>
         ))}

@@ -20,7 +20,7 @@ export function ChatHeader({
   onNewChat,
 }: ChatHeaderProps) {
   return (
-    <div className="flex flex-col gap-1 py-2 px-4 sticky top-0 bg-background z-5">
+    <div className="flex flex-col gap-1 py-2 px-4 sticky top-10 bg-background z-5">
       <div className="flex w-full justify-between items-center">
         <Button size="sm" onClick={onNewChat}>
           New Chat

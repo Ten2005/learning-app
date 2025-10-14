@@ -10,7 +10,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2Icon, Trash2Icon } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
 
 export default function DeleteConfirmationDialog({
@@ -46,11 +47,7 @@ export default function DeleteConfirmationDialog({
           disabled={isDeleting}
           onClick={handleTriggerClick}
         >
-          {isDeleting ? (
-            <Loader2Icon className="w-4 h-4 animate-spin" />
-          ) : (
-            <Trash2Icon className="w-4 h-4" />
-          )}
+          {isDeleting ? <Spinner /> : <Trash2Icon className="w-4 h-4" />}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -65,11 +62,7 @@ export default function DeleteConfirmationDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? (
-              <Loader2Icon className="w-4 h-4 animate-spin" />
-            ) : (
-              "Delete"
-            )}
+            {isDeleting ? <Spinner /> : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

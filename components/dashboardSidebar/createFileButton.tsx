@@ -2,7 +2,8 @@
 
 import { useSidebarStore } from "@/store/sidebar";
 import { Button } from "../ui/button";
-import { Loader2Icon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { createFileAfterCurrentAction } from "@/app/(main)/dashboard/actions";
 import { useDashboardStore } from "@/store/dashboard";
 
@@ -30,11 +31,7 @@ export default function CreateFileButton() {
       disabled={!currentFolder || !currentFile || isLoading}
       onClick={handleCreateFile}
     >
-      {isLoading ? (
-        <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <PlusIcon />
-      )}
+      {isLoading ? <Spinner /> : <PlusIcon />}
       New File
     </Button>
   );

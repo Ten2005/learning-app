@@ -71,36 +71,34 @@ export default function ConversationItem({
         className={cn(isSelected && "bg-accent")}
         asChild
       >
-        <div className="flex items-center gap-2 w-full">
+        <div className="flex items-center w-full">
           <span className="truncate flex-1 min-w-0">{title}</span>
-          {isSelected && (
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <SidebarMenuAction asChild showOnHover>
-                <EditConfirmationDialog
-                  editFunction={handleEdit}
-                  target={title || "Conversation"}
-                  onBeforeOpen={() => {
-                    editDialogOpenRef.current = true;
-                  }}
-                  onOpenChange={(open) => {
-                    editDialogOpenRef.current = open;
-                  }}
-                />
-              </SidebarMenuAction>
-              <SidebarMenuAction asChild showOnHover>
-                <DeleteConfirmationDialog
-                  deleteFunction={handleDelete}
-                  target={title || "Conversation"}
-                  onBeforeOpen={() => {
-                    deleteDialogOpenRef.current = true;
-                  }}
-                  onOpenChange={(open) => {
-                    deleteDialogOpenRef.current = open;
-                  }}
-                />
-              </SidebarMenuAction>
-            </div>
-          )}
+          <div className="flex items-center flex-shrink-0">
+            <SidebarMenuAction asChild showOnHover>
+              <EditConfirmationDialog
+                editFunction={handleEdit}
+                target={title || "Conversation"}
+                onBeforeOpen={() => {
+                  editDialogOpenRef.current = true;
+                }}
+                onOpenChange={(open) => {
+                  editDialogOpenRef.current = open;
+                }}
+              />
+            </SidebarMenuAction>
+            <SidebarMenuAction asChild showOnHover>
+              <DeleteConfirmationDialog
+                deleteFunction={handleDelete}
+                target={title || "Conversation"}
+                onBeforeOpen={() => {
+                  deleteDialogOpenRef.current = true;
+                }}
+                onOpenChange={(open) => {
+                  deleteDialogOpenRef.current = open;
+                }}
+              />
+            </SidebarMenuAction>
+          </div>
         </div>
       </SidebarMenuButton>
     </SidebarMenuItem>

@@ -86,6 +86,14 @@ export function useSegmentParser(startToken: string, endToken: string) {
           const startPos = precedingText.lastIndexOf(startToken);
 
           if (startPos !== -1) {
+            const segmentContent = content.substring(
+              startPos,
+              endPos + endToken.length,
+            );
+            const endTokenCount = segmentContent.split(endToken).length - 1;
+            if (endTokenCount > 1) {
+              return null;
+            }
             return { start: startPos, end: endPos + endToken.length };
           }
           return null;

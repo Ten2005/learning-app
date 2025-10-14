@@ -2,7 +2,8 @@
 
 import { UsedFolder, UsedFile } from "@/store/sidebar";
 import { Button } from "../ui/button";
-import { Pin, PinOff, Loader2 } from "lucide-react";
+import { Pin, PinOff } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -190,7 +191,7 @@ export default function Folders({
                   title={folder.is_pinned ? "Unpin" : "Pin"}
                 >
                   {pinningFolders.has(folder.id) ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Spinner />
                   ) : folder.is_pinned ? (
                     <Pin className="text-primary" />
                   ) : (

@@ -105,7 +105,7 @@ export default function SearchPage() {
         onChatTypeChange={setChatType}
         onNewChat={handleClearChat}
       />
-      <div className="p-2 h-[100dvh] overflow-y-auto sticky top-10 flex flex-col gap-6">
+      <div className="p-2 h-[100dvh] overflow-y-auto sticky top-24 flex flex-col gap-6">
         {messages.map((message, index) => (
           <div
             key={message.id}

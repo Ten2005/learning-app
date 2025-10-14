@@ -6,12 +6,12 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
-import NewFolderDialog from "./newFolderDialog";
+import NewFolderDialog from "@/components/dashboardSidebar/newFolderDialog";
 import { readFoldersAction } from "@/app/(main)/dashboard/actions";
 import Folders from "@/components/dashboardSidebar/folders";
 import CurrentFolder from "@/components/dashboardSidebar/currentFolder";
-import { ModeToggle } from "../modeToggle";
-import CreateFileButton from "./createFileButton";
+import { ModeToggle } from "@/components/modeToggle";
+import CreateFileButton from "@/components/dashboardSidebar/createFileButton";
 
 export async function DashboardSidebar() {
   const folders = await readFoldersAction();

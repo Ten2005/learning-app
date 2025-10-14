@@ -1,7 +1,7 @@
 "use client";
 
 import { useSidebarStore } from "@/store/sidebar";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { createFileAfterCurrentAction } from "@/app/(main)/dashboard/actions";

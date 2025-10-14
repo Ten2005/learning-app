@@ -1,7 +1,7 @@
 "use client";
 
 import { UsedFolder, UsedFile } from "@/store/sidebar";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { Pin, PinOff } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -9,7 +9,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenuAction,
-} from "../ui/sidebar";
+} from "@/components/ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
 import {
@@ -20,8 +20,8 @@ import {
 } from "@/app/(main)/dashboard/actions";
 import { useCallback, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import DeleteConfirmationDialog from "./deleteConfirmationDialog";
-import EditConfirmationDialog from "./editConfirmationDialog";
+import DeleteConfirmationDialog from "@/components/dashboardSidebar/deleteConfirmationDialog";
+import EditConfirmationDialog from "@/components/dashboardSidebar/editConfirmationDialog";
 
 type FolderWithFiles = UsedFolder & { files: UsedFile[] };
 

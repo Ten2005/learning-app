@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard";
 import { useSidebarStore } from "@/store/sidebar";
-import { useSidebar } from "../ui/sidebar";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function PageButtons() {
   const { currentFile, setCurrentFile } = useDashboardStore();

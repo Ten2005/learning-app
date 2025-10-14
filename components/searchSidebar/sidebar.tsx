@@ -7,7 +7,7 @@ import {
   SidebarMenu,
 } from "@/components/ui/sidebar";
 
-import { ModeToggle } from "../modeToggle";
+import { ModeToggle } from "@/components/modeToggle";
 import { readConversationsAction } from "@/app/(main)/search/actions";
 import ConversationItem from "@/components/searchSidebar/conversationItem";
 import DeleteAllButton from "@/components/searchSidebar/deleteAllButton";

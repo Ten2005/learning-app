@@ -7,7 +7,7 @@ import {
   SidebarGroupLabel,
   SidebarMenuButton,
   useSidebar,
-} from "../ui/sidebar";
+} from "@/components/ui/sidebar";
 import { useSidebarStore } from "@/store/sidebar";
 import { useDashboardStore } from "@/store/dashboard";
 import {
@@ -16,10 +16,10 @@ import {
   reorderFilesAction,
   editFileAction,
 } from "@/app/(main)/dashboard/actions";
-import DeleteConfirmationDialog from "./deleteConfirmationDialog";
+import DeleteConfirmationDialog from "@/components/dashboardSidebar/deleteConfirmationDialog";
 import { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import EditConfirmationDialog from "./editConfirmationDialog";
+import EditConfirmationDialog from "@/components/dashboardSidebar/editConfirmationDialog";
 
 export default function CurrentFolder() {
   const { currentFolder, currentFiles, setCurrentFiles } = useSidebarStore();

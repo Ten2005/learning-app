@@ -16,6 +16,7 @@ import Link from "next/link";
 const links = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/search", label: "Search" },
+  { href: "/schedule", label: "Schedule" },
 ];
 
 export default function Navigation() {

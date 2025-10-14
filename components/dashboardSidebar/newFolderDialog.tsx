@@ -1,7 +1,7 @@
 "use client";
 
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useSidebarStore } from "@/store/sidebar";

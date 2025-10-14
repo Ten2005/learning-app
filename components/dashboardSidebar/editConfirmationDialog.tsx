@@ -1,19 +1,9 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit2Icon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
+import ConfirmationDialog from "@/components/shared/confirmationDialog";
 
 export default function EditConfirmationDialog({
   editFunction,
@@ -30,17 +20,9 @@ export default function EditConfirmationDialog({
   const [newTitle, setNewTitle] = useState(target);
   const [open, setOpen] = useState(false);
 
-  const handleEdit = async () => {
-    setIsEditing(true);
-    await editFunction(newTitle);
-    setIsEditing(false);
-    setOpen(false);
-  };
-
   const handleTriggerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setNewTitle(target);
-    onBeforeOpen?.();
   };
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -48,9 +30,14 @@ export default function EditConfirmationDialog({
     onOpenChange?.(isOpen);
   };
 
+  const handleBeforeOpen = () => {
+    setNewTitle(target);
+    onBeforeOpen?.();
+  };
+
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogTrigger asChild>
+    <ConfirmationDialog
+      trigger={
         <Button
           variant="ghost"
           size="icon"
@@ -59,32 +46,30 @@ export default function EditConfirmationDialog({
         >
           {isEditing ? <Spinner /> : <Edit2Icon className="w-4 h-4" />}
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader className="overflow-x-auto scrollbar-hide">
-          <AlertDialogTitle className="overflow-x-auto scrollbar-hide whitespace-nowrap">
-            Edit <span className="text-primary">{target}</span>
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            This action will overwrite the current content.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <div className="grid gap-4">
-          <div className="grid gap-3">
-            <Input
-              id="title-input"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-            />
-          </div>
+      }
+      title={
+        <>
+          Edit <span className="text-primary">{target}</span>
+        </>
+      }
+      description="This action will overwrite the current content."
+      actionFunction={() => editFunction(newTitle)}
+      actionLabel="Edit"
+      isLoading={isEditing}
+      setIsLoading={setIsEditing}
+      open={open}
+      onOpenChange={handleOpenChange}
+      onBeforeOpen={handleBeforeOpen}
+    >
+      <div className="grid gap-4">
+        <div className="grid gap-3">
+          <Input
+            id="title-input"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+          />
         </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleEdit} disabled={isEditing}>
-            {isEditing ? <Spinner /> : "Edit"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      </div>
+    </ConfirmationDialog>
   );
 }

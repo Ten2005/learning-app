@@ -1,18 +1,8 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2Icon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useState } from "react";
+import ConfirmationDialog from "@/components/shared/confirmationDialog";
 
 export default function DeleteConfirmationDialog({
   deleteFunction,
@@ -27,19 +17,13 @@ export default function DeleteConfirmationDialog({
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    await deleteFunction();
-    setIsDeleting(false);
-  };
-
   const handleTriggerClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onBeforeOpen?.();
   };
+
   return (
-    <AlertDialog onOpenChange={onOpenChange}>
-      <AlertDialogTrigger asChild>
+    <ConfirmationDialog
+      trigger={
         <Button
           variant="ghost"
           size="icon"
@@ -49,23 +33,20 @@ export default function DeleteConfirmationDialog({
         >
           {isDeleting ? <Spinner /> : <Trash2Icon className="w-4 h-4" />}
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader className="overflow-x-auto scrollbar-hide">
-          <AlertDialogTitle className="overflow-x-auto scrollbar-hide whitespace-nowrap">
-            Delete <span className="text-primary">{target}</span>
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? <Spinner /> : "Delete"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      }
+      title={
+        <>
+          Delete <span className="text-primary">{target}</span>
+        </>
+      }
+      description="This action cannot be undone."
+      actionFunction={deleteFunction}
+      actionLabel="Delete"
+      actionVariant="destructive"
+      isLoading={isDeleting}
+      setIsLoading={setIsDeleting}
+      onOpenChange={onOpenChange}
+      onBeforeOpen={onBeforeOpen}
+    />
   );
 }

@@ -34,7 +34,7 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full items-center gap-2 px-4 py-2 sticky bottom-0 bg-background"
+      className="flex w-full items-center gap-2 px-2 pb-4 sticky bottom-0 bg-background"
     >
       <InputGroup>
         <TextareaAutosize

@@ -3,7 +3,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
   SidebarHeader,
 } from "@/components/ui/sidebar";
 
@@ -50,14 +49,12 @@ export function ScheduleSidebar() {
         <ModeToggle />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup className="px-0">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={handleDateSelect}
-            className="w-full"
-          />
-        </SidebarGroup>
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={handleDateSelect}
+          className="w-full"
+        />
       </SidebarContent>
     </Sidebar>
   );

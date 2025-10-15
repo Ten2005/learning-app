@@ -33,10 +33,32 @@ export default function Dashboard() {
   );
 
   useEffect(() => {
-    if (isMobile && !currentFile) {
-      setOpenMobile(true);
+    if (isMobile) {
+      if (!currentFile) {
+        setOpenMobile(true);
+      } else {
+        // モバイルでファイルが選択されたらサイドバーを閉じる
+        setOpenMobile(false);
+      }
     }
   }, [currentFile, isMobile, setOpenMobile]);
+
+  // ファイルが切り替わったときにカーソルを最後に移動
+  useEffect(() => {
+    if (currentFile && textareaRef.current) {
+      // contentが空の場合は明示的に空文字列を設定
+      if (!currentFile.content) {
+        setCurrentFile({ ...currentFile, content: "" });
+      }
+      const content = currentFile.content || "";
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.setSelectionRange(content.length, content.length);
+          textareaRef.current.focus();
+        }
+      }, 0);
+    }
+  }, [currentFile?.id, setCurrentFile]);
 
   useEffect(() => {
     if (!pendingSegment) return;

@@ -19,7 +19,7 @@ export const EditorTextarea = forwardRef<
       disabled={disabled}
       className="
           w-full flex-1
-          resize-none border-none shadow-none focus:border-none focus-visible:ring-0"
+          border-none shadow-none focus:border-none focus-visible:ring-0"
     />
   );
 });

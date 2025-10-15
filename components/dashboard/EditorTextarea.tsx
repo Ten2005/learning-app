@@ -18,7 +18,7 @@ export const EditorTextarea = forwardRef<
       onChange={onChange}
       disabled={disabled}
       className="
-          w-full flex-1 h-fit
+          w-full flex-1 h-fit min-h-[calc(100vh-5rem)]
           border-none shadow-none focus:border-none focus-visible:ring-0"
     />
   );

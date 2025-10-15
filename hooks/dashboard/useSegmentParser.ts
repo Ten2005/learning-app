@@ -69,7 +69,9 @@ export function useSegmentParser(startToken: string, endToken: string) {
   );
 
   const removeSegments = useCallback(
-    (content: string): string => {
+    (
+      content: string,
+    ): { newContent: string; cursorPosition: number | null } => {
       const endPositions: number[] = [];
       let searchIndex = 0;
 
@@ -101,10 +103,21 @@ export function useSegmentParser(startToken: string, endToken: string) {
         .filter((seg): seg is { start: number; end: number } => seg !== null)
         .sort((a, b) => b.start - a.start);
 
-      return segmentsToRemove.reduce(
+      // 最初に削除されるセグメント（最も前にあるもの）の開始位置を保存
+      const firstSegment =
+        segmentsToRemove.length > 0
+          ? segmentsToRemove[segmentsToRemove.length - 1]
+          : null;
+
+      const newContent = segmentsToRemove.reduce(
         (text, seg) => text.slice(0, seg.start) + text.slice(seg.end),
         content,
       );
+
+      // 削除があった場合、最初のセグメントの開始位置をカーソル位置として返す
+      const cursorPosition = firstSegment ? firstSegment.start : null;
+
+      return { newContent, cursorPosition };
     },
     [startToken, endToken],
   );

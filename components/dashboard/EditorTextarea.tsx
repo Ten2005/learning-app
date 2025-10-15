@@ -1,4 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
+import { forwardRef } from "react";
 
 type EditorTextareaProps = {
   value: string;
@@ -6,19 +7,21 @@ type EditorTextareaProps = {
   disabled: boolean;
 };
 
-export function EditorTextarea({
-  value,
-  onChange,
-  disabled,
-}: EditorTextareaProps) {
+export const EditorTextarea = forwardRef<
+  HTMLTextAreaElement,
+  EditorTextareaProps
+>(({ value, onChange, disabled }, ref) => {
   return (
     <Textarea
+      ref={ref}
       value={value}
       onChange={onChange}
       disabled={disabled}
       className="
-        w-full flex-1
-        resize-none border-none shadow-none focus:border-none focus-visible:ring-0"
+          w-full flex-1
+          resize-none border-none shadow-none focus:border-none focus-visible:ring-0"
     />
   );
-}
+});
+
+EditorTextarea.displayName = "EditorTextarea";

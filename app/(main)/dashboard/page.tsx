@@ -1,7 +1,7 @@
 "use client";
 
 import { useDashboardStore } from "@/store/dashboard";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useCommandAgent } from "@/hooks/dashboard/useCommandAgent";
 import { useAutoSave } from "@/hooks/dashboard/useAutoSave";
@@ -18,6 +18,7 @@ import {
 export default function Dashboard() {
   const { currentFile, setCurrentFile } = useDashboardStore();
   const { isMobile, setOpenMobile } = useSidebar();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { processCommandAgent, pendingSegment, setPendingSegment } =
     useCommandAgent(currentFile?.content);
@@ -70,10 +71,10 @@ export default function Dashboard() {
   const handleTextAreaChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (currentFile) {
-        let content = e.target.value;
-        content = removeSegments(content);
+        const content = e.target.value;
+        const { newContent, cursorPosition } = removeSegments(content);
 
-        const updatedFile = { ...currentFile, content };
+        const updatedFile = { ...currentFile, content: newContent };
         setCurrentFile(updatedFile);
 
         scheduleAutoSave(
@@ -81,6 +82,19 @@ export default function Dashboard() {
           updatedFile.title || "",
           updatedFile.content || "",
         );
+
+        // カーソル位置を設定（削除があった場合）
+        if (cursorPosition !== null && textareaRef.current) {
+          setTimeout(() => {
+            if (textareaRef.current) {
+              textareaRef.current.setSelectionRange(
+                cursorPosition,
+                cursorPosition,
+              );
+              textareaRef.current.focus();
+            }
+          }, 0);
+        }
       }
     },
     [currentFile, setCurrentFile, scheduleAutoSave, removeSegments],
@@ -90,6 +104,7 @@ export default function Dashboard() {
     <>
       <DashboardHeader />
       <EditorTextarea
+        ref={textareaRef}
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}
         disabled={!currentFile}

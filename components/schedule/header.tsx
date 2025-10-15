@@ -32,7 +32,7 @@ export function ScheduleHeader() {
   };
 
   return (
-    <div className="flex flex-col justify-between py-1 px-2 sticky top-10 bg-background z-5">
+    <div className="flex flex-col justify-between py-1 px-2 sticky top-10 z-5">
       <div className="flex flex-row justify-between pb-1">
         <div className="flex flex-row items-center max-w-full truncate overflow-x-auto scrollbar-hide">
           <Label className="text-primary">{currentDate || "Loading..."}</Label>

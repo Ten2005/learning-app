@@ -8,7 +8,7 @@ export function DashboardHeader() {
   const { currentFolder } = useSidebarStore();
 
   return (
-    <div className="flex flex-col justify-between py-1 px-2 sticky top-10 bg-background z-5">
+    <div className="flex flex-col justify-between py-1 px-2 sticky top-10 z-5">
       <div className="flex flex-row justify-between pb-1">
         <ShowTitle />
         {currentFolder && <PageButtons />}

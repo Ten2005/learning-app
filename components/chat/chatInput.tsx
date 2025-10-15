@@ -1,4 +1,5 @@
 import type { ChatStatus } from "ai";
+import { useState } from "react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -6,6 +7,7 @@ import {
 } from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
 import TextareaAutosize from "react-textarea-autosize";
+import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
   input: string;
@@ -21,6 +23,7 @@ export function ChatInput({
   onSubmit,
 }: ChatInputProps) {
   const isReady = status === "ready";
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +37,16 @@ export function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full items-center gap-2 px-2 pb-4 sticky bottom-0 bg-background"
+      className="flex w-full items-start gap-2 px-2 pb-4 h-36 sticky bottom-0"
     >
-      <InputGroup>
+      <InputGroup className={cn(isFocused && "bg-background")}>
         <TextareaAutosize
           value={input}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             onInputChange(e.target.value)
           }
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           className="flex field-sizing-content min-h-16 w-full resize-none rounded-md bg-transparent px-3 py-2.5 text-base transition-[color,box-shadow] outline-none"
         />
         <InputGroupAddon align="block-end">

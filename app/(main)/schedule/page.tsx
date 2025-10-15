@@ -135,13 +135,13 @@ export default function Schedule() {
   );
 
   return (
-    <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
+    <>
       <ScheduleHeader />
       <EditorTextarea
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}
         disabled={!currentFile || isLoading}
       />
-    </div>
+    </>
   );
 }

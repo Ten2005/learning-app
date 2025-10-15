@@ -18,7 +18,7 @@ export function EditorTextarea({
       disabled={disabled}
       className="
         w-full flex-1
-        resize-none border-none focus:border-none focus-visible:ring-0"
+        resize-none border-none shadow-none focus:border-none focus-visible:ring-0"
     />
   );
 }

@@ -4,7 +4,7 @@ import { useChatStore } from "@/store/chat";
 import { Message } from "@/components/chat/message";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { saveMessageAction } from "./actions";
 import { useRouter } from "next/navigation";
 import { useConversationSync } from "@/hooks/search/useConversationSync";
@@ -23,32 +23,65 @@ export default function SearchPage() {
   } = useChatStore();
   const router = useRouter();
   const conversationIdRef = useRef<number | null>(currentConversationId);
+  const chatTypeRef = useRef(chatType);
   const { isMobile, setOpenMobile } = useSidebar();
   const latestUserMessageRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(0);
+  const prevConversationIdRef = useRef<number | null>(currentConversationId);
+
+  // null→IDへの遷移時は再初期化を避けるため、useChatのidを安定させる
+  const [stableChatId, setStableChatId] = useState<string>(() =>
+    currentConversationId ? `${currentConversationId}` : `new`,
+  );
+
+  useEffect(() => {
+    const prevId = prevConversationIdRef.current;
+    const currentId = currentConversationId;
+
+    // null→数値への遷移の場合は、idを更新しない（再初期化を避ける）
+    if (prevId === null && currentId !== null) {
+      // idを更新しない
+    } else {
+      // それ以外の場合は通常通り更新
+      setStableChatId(currentId ? `${currentId}` : `new`);
+    }
+
+    prevConversationIdRef.current = currentId;
+  }, [currentConversationId]);
+
+  // chatTypeRefを常に最新のchatTypeと同期
+  useEffect(() => {
+    chatTypeRef.current = chatType;
+  }, [chatType]);
 
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
-        api: `/api/chat/${chatType}`,
         fetch: async (url, options) => {
+          // 最新のchatTypeを使用してAPIエンドポイントを動的に決定
+          const apiUrl = `/api/chat/${chatTypeRef.current}`;
           const body = JSON.parse(options?.body as string);
           body.conversationId = conversationIdRef.current;
-          return fetch(url, {
+          return fetch(apiUrl, {
             ...options,
             body: JSON.stringify(body),
           });
         },
       }),
-    [chatType],
+    [], // 依存配列を空にして、transportを固定
   );
 
   const { messages, setMessages, sendMessage, status } = useChat({
-    id: chatType,
+    id: stableChatId,
     transport,
   });
 
   useConversationSync(setMessages, setCurrentConversationId);
+
+  // conversationIdRefを常に最新のcurrentConversationIdと同期
+  useEffect(() => {
+    conversationIdRef.current = currentConversationId;
+  }, [currentConversationId]);
 
   useEffect(() => {
     if (isMobile && currentConversationId) {
@@ -80,8 +113,13 @@ export default function SearchPage() {
   };
 
   const handleSubmit = async (inputText: string) => {
+    // 送信中または既に処理中の場合は早期リターン
+    if (status !== "ready") {
+      return;
+    }
+
     const savedId = await saveMessageAction(
-      currentConversationId,
+      conversationIdRef.current,
       inputText,
       "user",
     );
@@ -99,13 +137,13 @@ export default function SearchPage() {
   );
 
   return (
-    <div className="flex flex-col h-[100dvh]">
+    <div className="flex flex-col w-full h-full">
       <ChatHeader
         chatType={chatType}
         onChatTypeChange={setChatType}
         onNewChat={handleClearChat}
       />
-      <div className="p-2 flex-1 overflow-y-auto flex flex-col gap-6">
+      <div className="p-2 flex-1 flex sticky top-24 flex-col gap-6 mb-36">
         {messages.map((message, index) => (
           <div
             key={message.id}

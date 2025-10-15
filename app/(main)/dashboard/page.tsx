@@ -87,13 +87,13 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="flex flex-col w-full h-[100dvh] max-h-[100dvh]">
+    <>
       <DashboardHeader />
       <EditorTextarea
         value={currentFile?.content || ""}
         onChange={handleTextAreaChange}
         disabled={!currentFile}
       />
-    </div>
+    </>
   );
 }

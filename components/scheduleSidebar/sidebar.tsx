@@ -51,7 +51,7 @@ export function ScheduleSidebar() {
         <ModeToggle />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
+        <SidebarGroup className="px-0">
           <SidebarGroupContent>
             <Calendar
               mode="single"

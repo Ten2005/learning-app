@@ -1,5 +1,5 @@
-import { xai } from "@ai-sdk/xai";
-import { streamText, UIMessage, convertToModelMessages } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
+import { streamText, UIMessage, convertToModelMessages, Tool } from "ai";
 import { addMessage } from "@/lib/db/chat";
 import { revalidatePath, revalidateTag } from "next/cache";
 
@@ -10,17 +10,15 @@ export async function POST(req: Request) {
   }: { messages: UIMessage[]; conversationId: number | null } =
     await req.json();
 
+  const webSearchTool = anthropic.tools.webSearch_20250305({
+    maxUses: 5,
+  }) as unknown as Tool;
+
   const result = streamText({
-    model: xai.chat("grok-code-fast-1"),
+    model: anthropic.chat("claude-haiku-4-5-20251001"),
     messages: convertToModelMessages(messages),
-    providerOptions: {
-      xai: {
-        searchParameters: {
-          mode: "on", // 'auto', 'on', or 'off'
-          returnCitations: true,
-          maxSearchResults: 5,
-        },
-      },
+    tools: {
+      web_search: webSearchTool,
     },
     onFinish: async ({ text }) => {
       // サーバー側でアシスタントメッセージを保存

@@ -72,7 +72,7 @@ function CommandUsage() {
     <div className="space-y-4">
       <div className="space-y-2">
         <p className="text-sm">
-          // Content enclosed with
+          <span>&#47;&#47; Content enclosed with</span>
           <code className="bg-muted px-1 rounded">&quot;-&gt;&quot;</code> and
           <code className="bg-muted px-1 rounded">&quot;&lt;-&quot;</code> is
           recognized as a command. Use the following format to get a response:
@@ -99,7 +99,7 @@ function CommandUsage() {
       </div>
       <div className="space-y-2">
         <p className="text-sm">
-          // Content enclosed with
+          <span>&#47;&#47; Content enclosed with</span>
           <code className="bg-muted px-1 rounded">&quot;&gt;&gt;&quot;</code>
           and
           <code className="bg-muted px-1 rounded">&quot;&lt;&lt;&quot;</code>
@@ -111,7 +111,9 @@ function CommandUsage() {
       </div>
       <div className="space-y-2">
         <p className="text-sm">
-          // Choose the model you want to use for the command.
+          <span>
+            &#47;&#47; Choose the model you want to use for the command.
+          </span>
         </p>
       </div>
     </div>

@@ -2,8 +2,6 @@ import { useDashboardStore } from "@/store/dashboard";
 import { useSidebarStore } from "@/store/sidebar";
 import PageButtons from "@/components/dashboard/pageButton";
 import { readFilesAction } from "@/app/(main)/dashboard/actions";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -16,8 +14,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
-  DialogClose,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,6 +21,21 @@ import {
 import { InfoIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function DashboardHeader() {
   const { currentFolder, setCurrentFiles } = useSidebarStore();
@@ -36,6 +47,7 @@ export function DashboardHeader() {
       return;
     }
 
+    const targetId = currentFolder.id;
     const formData = new FormData(e.target as HTMLFormElement);
     const queryValue = formData.get("query") as string;
     setOpen(false);
@@ -48,20 +60,20 @@ export function DashboardHeader() {
         },
         body: JSON.stringify({
           prompt: queryValue,
-          folderId: currentFolder.id,
+          folderId: targetId,
         }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to process query");
       }
-
-      const data = await response.json();
     } catch (error) {
       console.error("Error processing query:", error);
     } finally {
-      readFilesAction(currentFolder.id);
-      setCurrentFiles(await readFilesAction(currentFolder.id));
+      if (currentFolder.id === targetId) {
+        readFilesAction(targetId);
+        setCurrentFiles(await readFilesAction(targetId));
+      }
     }
   };
 
@@ -102,36 +114,43 @@ export function DashboardHeader() {
         </div>
         {currentFolder && (
           <div className="flex flex-row items-center gap-2">
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
                 <Button size="icon">
                   <Search className="size-4" />
                 </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <DialogHeader>
-                    <DialogTitle>Search</DialogTitle>
-                    <DialogDescription>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-full">
+                <ScrollArea className="h-[100dvh] px-2 pb-4">
+                  <SheetHeader>
+                    <SheetTitle>Search</SheetTitle>
+                    <SheetDescription>
                       Generate a response based on your input query, which will
                       be added to a new page.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4">
-                    <div className="grid gap-3">
-                      <Label htmlFor="query">Query</Label>
-                      <Input id="query" name="query" defaultValue="" />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit">Execute</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+                    </SheetDescription>
+                  </SheetHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <InputGroup className="sticky buttom-0 min-h-[calc(100dvh-100px)]">
+                      <InputGroupTextarea
+                        placeholder="Enter your query..."
+                        name="query"
+                        defaultValue=""
+                      />
+                      <InputGroupAddon align="block-end">
+                        <InputGroupButton
+                          className="ml-auto"
+                          size="sm"
+                          variant="default"
+                          type="submit"
+                        >
+                          Search
+                        </InputGroupButton>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </form>
+                </ScrollArea>
+              </SheetContent>
+            </Sheet>
             <PageButtons />
           </div>
         )}

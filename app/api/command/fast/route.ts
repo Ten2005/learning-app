@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const strippedText = await removeMarkdown(text);
     return NextResponse.json({ text: strippedText });
   } catch (error) {
-    console.error("agent route failed", error);
-    return NextResponse.json({ error: "agent failed" }, { status: 500 });
+    console.error("command fast route failed", error);
+    return NextResponse.json({ error: "command fast failed" }, { status: 500 });
   }
 }

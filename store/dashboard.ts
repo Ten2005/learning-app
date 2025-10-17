@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { UsedFile } from "@/store/sidebar";
+import { COMMAND_MODEL_OPTIONS } from "@/constants/dashboard";
 
 interface DashboardState {
   currentFile: UsedFile | undefined;
@@ -18,6 +19,11 @@ interface DashboardState {
     currentFile: UsedFile | undefined;
     autoSaveTimeout: NodeJS.Timeout | null;
   };
+
+  commandModel: (typeof COMMAND_MODEL_OPTIONS)[number];
+  setCommandModel: (
+    commandModel: (typeof COMMAND_MODEL_OPTIONS)[number],
+  ) => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -37,4 +43,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const { currentFile, autoSaveTimeout } = get();
     return { currentFile, autoSaveTimeout };
   },
+
+  commandModel: "fast",
+  setCommandModel: (commandModel) => set({ commandModel }),
 }));

@@ -3,14 +3,42 @@ import { useDashboardStore } from "@/store/dashboard";
 import { useSidebarStore } from "@/store/sidebar";
 import PageButtons from "@/components/dashboard/pageButton";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { COMMAND_MODEL_OPTIONS } from "@/constants/dashboard";
 
 export function DashboardHeader() {
   const { currentFolder } = useSidebarStore();
+  const { commandModel, setCommandModel } = useDashboardStore();
 
   return (
-    <div className="flex flex-col justify-between py-1 px-2 sticky top-10 z-5">
-      <div className="flex flex-row justify-between pb-1">
-        <ShowTitle />
+    <div className="flex flex-col justify-center py-1 px-2 sticky h-10 top-10 z-5">
+      <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center gap-2">
+          <ShowTitle />
+          <Select
+            value={commandModel}
+            onValueChange={(v) =>
+              setCommandModel(v as (typeof COMMAND_MODEL_OPTIONS)[number])
+            }
+          >
+            <SelectTrigger className="w-[100px]">
+              <SelectValue placeholder="Model" />
+            </SelectTrigger>
+            <SelectContent>
+              {COMMAND_MODEL_OPTIONS.map((model) => (
+                <SelectItem key={model} value={model}>
+                  {model}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {currentFolder && <PageButtons />}
       </div>
     </div>

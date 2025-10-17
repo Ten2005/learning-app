@@ -16,12 +16,12 @@ import {
 } from "@/constants/dashboard";
 
 export default function Dashboard() {
-  const { currentFile, setCurrentFile } = useDashboardStore();
+  const { currentFile, setCurrentFile, commandModel } = useDashboardStore();
   const { isMobile, setOpenMobile } = useSidebar();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { processCommandAgent, pendingSegment, setPendingSegment } =
-    useCommandAgent(currentFile?.content);
+    useCommandAgent(currentFile?.content, commandModel);
   const { scheduleAutoSave } = useAutoSave(processCommandAgent);
   const { replacePendingSegment } = useSegmentParser(
     SEGMENT_START_FRAG,

@@ -3,11 +3,15 @@ import {
   SEGMENT_START_FRAG,
   SEGMENT_END_FRAG,
   SEGMENT_SEPARATOR,
+  COMMAND_MODEL_OPTIONS,
 } from "@/constants/dashboard";
 import type { PendingSegment, CommandAgentResponse } from "@/types/dashboard";
 import { useSegmentParser } from "@/hooks/dashboard/useSegmentParser";
 
-export function useCommandAgent(currentFileContent: string | undefined) {
+export function useCommandAgent(
+  currentFileContent: string | undefined,
+  model: (typeof COMMAND_MODEL_OPTIONS)[number] = "fast",
+) {
   const [arrowCount, setArrowCount] = useState(0);
   const initialized = useRef(false);
   const [pendingSegment, setPendingSegment] = useState<PendingSegment | null>(
@@ -39,7 +43,7 @@ export function useCommandAgent(currentFileContent: string | undefined) {
       }
 
       try {
-        const result = await fetch("/api/chat/agent", {
+        const result = await fetch(`/api/command/${model}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

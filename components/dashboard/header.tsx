@@ -198,7 +198,7 @@ function CommandUsage() {
           can be deleted. Use the following format to delete:
         </p>
         <p className="text-xs text-muted-foreground bg-muted p-2 rounded font-mono">
-          &gt;&gt; query &lt;&lt;
+          &gt;&gt; content to delete &lt;&lt;
         </p>
       </div>
       <div className="space-y-2">

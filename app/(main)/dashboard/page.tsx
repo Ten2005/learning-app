@@ -58,7 +58,7 @@ export default function Dashboard() {
         }
       }, 0);
     }
-  }, [currentFile, setCurrentFile]);
+  }, [currentFile?.id, setCurrentFile]);
 
   useEffect(() => {
     if (!pendingSegment) return;

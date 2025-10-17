@@ -6,14 +6,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Meteors } from "@/components/meteors";
 import Link from "next/link";
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from "@/constants";
 
 export default function Home() {
   return (
     <main className="min-h-[100dvh] flex items-center px-4 py-8">
-      <Meteors number={40} />
       <section className="flex flex-col gap-6 max-w-screen-md w-full mx-auto">
         <HoverCard openDelay={0} closeDelay={0}>
           <HoverCardTrigger>

@@ -16,10 +16,6 @@ export async function POST(req: Request) {
       tools,
       messages: [
         {
-          role: "system",
-          content: "Please provide concise answers.",
-        },
-        {
           role: "user",
           content: prompt,
         },

@@ -20,6 +20,38 @@ export async function createFile(parent_id: number, page: number) {
   return data;
 }
 
+export async function createFileWithContent(
+  parent_id: number,
+  title: string,
+  content: string,
+) {
+  const supabase = await createClient();
+  const user = await getUser();
+
+  const files = await readFiles(parent_id);
+  const lastPage =
+    files.length > 0 ? Math.max(...files.map((f) => f.page)) : -1;
+  const newPage = lastPage + 1;
+
+  const { data, error } = await supabase
+    .from("file")
+    .insert({
+      user_id: user.id,
+      parent_id,
+      page: newPage,
+      title,
+      content,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw new Error("Failed to create file with content");
+  }
+  return data;
+}
+
 export async function readFiles(parent_id: number) {
   const supabase = await createClient();
   const user = await getUser();

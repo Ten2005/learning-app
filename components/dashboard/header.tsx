@@ -1,8 +1,9 @@
-import { Label } from "@/components/ui/label";
 import { useDashboardStore } from "@/store/dashboard";
 import { useSidebarStore } from "@/store/sidebar";
 import PageButtons from "@/components/dashboard/pageButton";
-import { cn } from "@/lib/utils";
+import { readFilesAction } from "@/app/(main)/dashboard/actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,21 +16,59 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogClose,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export function DashboardHeader() {
-  const { currentFolder } = useSidebarStore();
+  const { currentFolder, setCurrentFiles } = useSidebarStore();
   const { commandModel, setCommandModel } = useDashboardStore();
+  const [open, setOpen] = useState(false);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!currentFolder) {
+      return;
+    }
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const queryValue = formData.get("query") as string;
+    setOpen(false);
+    try {
+      // api/queryに送信
+      const response = await fetch("/api/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: queryValue,
+          folderId: currentFolder.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to process query");
+      }
+
+      const data = await response.json();
+    } catch (error) {
+      console.error("Error processing query:", error);
+    } finally {
+      readFilesAction(currentFolder.id);
+      setCurrentFiles(await readFilesAction(currentFolder.id));
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center py-1 px-2 sticky h-10 top-10 z-5">
       <div className="flex flex-row items-center justify-between">
         <div className="flex flex-row items-center gap-2">
-          <ShowTitle />
           <Select
             value={commandModel}
             onValueChange={(v) =>
@@ -49,7 +88,7 @@ export function DashboardHeader() {
           </Select>
           <Dialog>
             <DialogTrigger>
-              <InfoIcon className="size-5 text-primary" />
+              <InfoIcon className="size-4 text-primary" />
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -61,7 +100,41 @@ export function DashboardHeader() {
             </DialogContent>
           </Dialog>
         </div>
-        {currentFolder && <PageButtons />}
+        {currentFolder && (
+          <div className="flex flex-row items-center gap-2">
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button size="icon">
+                  <Search className="size-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <DialogHeader>
+                    <DialogTitle>Search</DialogTitle>
+                    <DialogDescription>
+                      Generate a response based on your input query, which will
+                      be added to a new page.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4">
+                    <div className="grid gap-3">
+                      <Label htmlFor="query">Query</Label>
+                      <Input id="query" name="query" defaultValue="" />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button type="submit">Execute</Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+            <PageButtons />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -116,26 +189,6 @@ function CommandUsage() {
           </span>
         </p>
       </div>
-    </div>
-  );
-}
-
-function ShowTitle() {
-  const { currentFile } = useDashboardStore();
-  const { currentFolder } = useSidebarStore();
-
-  return (
-    <div className="flex flex-row items-center max-w-full truncate overflow-x-auto scrollbar-hide">
-      <span className="text-xs text-muted-foreground px-1">
-        {currentFolder?.name} -&gt; {currentFile?.page} :
-      </span>
-      <Label
-        className={cn(
-          currentFile?.title ? "text-primary" : "text-muted-foreground",
-        )}
-      >
-        {currentFile?.title ? currentFile.title : "None"}
-      </Label>
     </div>
   );
 }

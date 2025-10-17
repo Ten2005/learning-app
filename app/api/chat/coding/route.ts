@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   }) as unknown as Tool;
 
   const result = streamText({
-    model: anthropic.chat("claude-haiku-4-5"),
+    model: anthropic.chat("claude-sonnet-4-5"),
     messages: convertToModelMessages(messages),
     tools: {
       web_search: webSearchTool,

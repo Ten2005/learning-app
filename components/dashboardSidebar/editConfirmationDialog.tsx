@@ -67,6 +67,8 @@ export default function EditConfirmationDialog({
             id="title-input"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
           />
         </div>
       </div>

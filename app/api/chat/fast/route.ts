@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   } as unknown as ToolSet;
 
   const result = streamText({
-    model: google.chat("gemini-2.5-flash-lite"),
+    model: google.chat("gemini-2.5-flash"),
     tools,
     messages: convertToModelMessages(messages),
     onFinish: async ({ text }) => {

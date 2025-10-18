@@ -39,7 +39,9 @@ export function ChatInput({
       onSubmit={handleSubmit}
       className="flex w-full items-start gap-2 px-2 pb-4 h-36 sticky bottom-0"
     >
-      <InputGroup className={cn(isFocused && "bg-background")}>
+      <InputGroup
+        className={cn(isFocused && "bg-background dark:bg-background")}
+      >
         <TextareaAutosize
           value={input}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
